@@ -1,6 +1,6 @@
 # Calendar Application
 
-A Java 21 client–server calendar application built with Maven. This project is designed with modularity, abstraction and common design patterns (such as Visitor, and Factory, ...) to allow future enhancements (for example, adding a GUI, new commands or add different backing database). Currently, the application is meant to run on the command line backed with xml-file-base database.
+A Java 21 client–server calendar application built with Maven. This project is designed with modularity, abstraction and common design patterns (such as Visitor, Factory, ...) to allow future enhancements (for example, adding a GUI, new commands or add different backing database). Currently, the application is meant to run on the command line backed with xml-file-base database.
 
 ## Modules
 
