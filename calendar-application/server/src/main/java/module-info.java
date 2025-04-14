@@ -1,4 +1,6 @@
-module com.tesco.calendar.server {
-    requires com.tesco.calendar.core;
+module cz.cuni.mff.danekji.calendar.server {
+    requires cz.cuni.mff.danekji.calendar.core;
     requires java.logging;
+    requires org.apache.logging.log4j;
+    requires java.xml;
 }

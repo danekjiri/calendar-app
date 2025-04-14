@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.tesco</groupId>
+        <groupId>cz.cuni.mff.danekji1</groupId>
         <artifactId>calendar-application</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
@@ -14,15 +14,15 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.tesco</groupId>
-            <artifactId>core</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>RELEASE</version>
+            <version>5.12.1</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>cz.cuni.mff.danekji1</groupId>
+            <artifactId>core</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

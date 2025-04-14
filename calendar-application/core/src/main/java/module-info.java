@@ -1,11 +1,7 @@
-module com.tesco.calendar.core {
-    exports com.tesco.calendar.core.commands
-            to com.tesco.calendar.server,
-            com.tesco.calendar.client;
-    exports com.tesco.calendar.core.responses
-            to com.tesco.calendar.server,
-            com.tesco.calendar.client;
-    exports com.tesco.calendar.core.models
-            to com.tesco.calendar.server,
-            com.tesco.calendar.client;
+module cz.cuni.mff.danekji.calendar.core {
+    requires org.apache.logging.log4j;
+    exports cz.cuni.mff.danekji1.calendar.core.commands;
+    exports cz.cuni.mff.danekji1.calendar.core.responses;
+    exports cz.cuni.mff.danekji1.calendar.core.models;
+    exports cz.cuni.mff.danekji1.calendar.core.exceptions;
 }
