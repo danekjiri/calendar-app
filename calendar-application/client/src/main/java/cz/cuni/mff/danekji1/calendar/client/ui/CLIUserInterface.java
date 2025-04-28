@@ -4,6 +4,7 @@ import cz.cuni.mff.danekji1.calendar.client.Client;
 import cz.cuni.mff.danekji1.calendar.core.commands.Command;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.InvalidInputException;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.UnknownCommandException;
+import cz.cuni.mff.danekji1.calendar.core.models.User;
 import cz.cuni.mff.danekji1.calendar.core.responses.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,11 +20,18 @@ public final class CLIUserInterface implements UserInterface {
 
     private final Scanner userInput;
     private final OutputStreamWriter userOutput;
-    private final ResponseVisitor<Void> responseDispatcher = new DefaultResponseDispatcher();
+    private final ResponseVisitor<Void> responseDispatcher;
+
+    private User user = null;
 
     public CLIUserInterface(InputStream userInput, OutputStream userOutput) {
         this.userInput = new Scanner(userInput);
-        this.userOutput = new OutputStreamWriter(userOutput);;
+        this.userOutput = new OutputStreamWriter(userOutput);
+        this.responseDispatcher = new DefaultCLIResponseDispatcher(this);
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     /**
@@ -40,7 +48,7 @@ public final class CLIUserInterface implements UserInterface {
         LOGGER.debug("Starting user interface, waiting for commands...");
         while(client.isConnectionOpen()) {
             try {
-                String prompt = formatUserPrompt(client.getUsername());
+                String prompt = formatUserPrompt();
                 String inputCommand = promptForInput(prompt).trim();
                 Command command = CLICommandParser.parse(inputCommand, this);
 
@@ -58,8 +66,8 @@ public final class CLIUserInterface implements UserInterface {
      * Formats the prompt for the user.
      * The prompt includes the username and a fixed string.
      */
-    private String formatUserPrompt(String username) {
-        return String.format("\n$%s@calendar> ", username);
+    private String formatUserPrompt() {
+        return String.format("\n$%s@calendar> ", user != null ? user.username() : "unlogged");
     }
 
     /**

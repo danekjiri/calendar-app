@@ -8,7 +8,7 @@ import java.util.List;
  */
 public interface EventRepository {
     void createAccount(String username, int passwordHash);
-    void authenticate(String username, int passwordHash);
+    boolean authenticate(String username, int passwordHash);
 
     void addEvent(String username, Event event);
     void removeEvent(String username, Long eventId);

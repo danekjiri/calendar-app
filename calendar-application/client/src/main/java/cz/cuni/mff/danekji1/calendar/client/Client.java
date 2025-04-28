@@ -25,7 +25,6 @@ public class Client {
     private ObjectInputStream in;
     private final UserInterface ui;
     private int sessionId;
-    private String username;
 
     public boolean isConnectionOpen() {
         return socket != null &&  socket.isConnected() && !socket.isClosed();
@@ -33,15 +32,6 @@ public class Client {
 
     public Client(UserInterface ui) {
         this.ui = ui;
-        this.username = "unlogged";
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     /**

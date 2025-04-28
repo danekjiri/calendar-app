@@ -2,6 +2,7 @@ package cz.cuni.mff.danekji1.calendar.client.ui;
 
 import cz.cuni.mff.danekji1.calendar.core.commands.Command;
 import cz.cuni.mff.danekji1.calendar.core.commands.CreateAccountCommand;
+import cz.cuni.mff.danekji1.calendar.core.commands.LoginCommand;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.InvalidInputException;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.UnknownCommandException;
 
@@ -28,6 +29,7 @@ public final class CLICommandParser {
     // Static initializer block to register known commands
     static {
         registerCommand(CreateAccountCommand.COMMAND_NAME, CLICommandParser::buildCreateAccountCommand);
+        registerCommand(LoginCommand.COMMAND_NAME, CLICommandParser::buildLoginCommand);
         // Add other commands here
     }
 
@@ -75,5 +77,20 @@ public final class CLICommandParser {
 
         int passwordHash = password.hashCode();
         return new CreateAccountCommand(username, passwordHash);
+    }
+
+    private static LoginCommand buildLoginCommand(UserInterface ui) throws IOException, InvalidInputException {
+        String username = ui.promptForInput("Enter username: ").trim();
+        if (username.isEmpty() || username.equals("unlogged")) {
+            throw new InvalidInputException("Username cannot be empty or 'unlogged'");
+        }
+
+        String password = ui.promptForInput("Enter password: ");
+        if (password.isEmpty()) {
+            throw new InvalidInputException("Password cannot be empty");
+        }
+
+        int passwordHash = password.hashCode();
+        return new LoginCommand(username, passwordHash);
     }
 }

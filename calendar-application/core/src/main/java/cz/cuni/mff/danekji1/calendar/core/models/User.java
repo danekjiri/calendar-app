@@ -6,4 +6,4 @@ import java.io.Serializable;
  * Represents a user in the system.
  * Contains username and password hash.
  */
-public record User(String username, String passwordHash) implements Serializable {  }
+public record User(String username, int passwordHash) implements Serializable {  }

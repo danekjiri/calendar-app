@@ -5,6 +5,7 @@ package cz.cuni.mff.danekji1.calendar.core.responses;
  */
 public interface ResponseVisitor<R> {
     R visit(SuccessResponse response);
+    R visit(SuccessLoginResponse response);
     R visit(ErrorResponse response);
     R visit(EventListResponse response);
 }

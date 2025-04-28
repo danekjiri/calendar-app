@@ -10,7 +10,6 @@ public final class Session {
     private final int sessionId;
     ///  todo: add some endofsession time
 
-
     public Session(int sessionId) {
         this.sessionId = sessionId;
     }
@@ -25,5 +24,9 @@ public final class Session {
 
     public void setCurrentUser(User user) {
         this.currentUser = user;
+    }
+
+    public boolean isLoggedIn() {
+       return currentUser != null;
     }
 }

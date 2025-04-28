@@ -1,7 +1,9 @@
 package cz.cuni.mff.danekji1.calendar.server;
 
 import cz.cuni.mff.danekji1.calendar.core.exceptions.CalendarException;
+import cz.cuni.mff.danekji1.calendar.core.models.User;
 import cz.cuni.mff.danekji1.calendar.core.responses.ErrorResponse;
+import cz.cuni.mff.danekji1.calendar.core.responses.SuccessLoginResponse;
 import cz.cuni.mff.danekji1.calendar.core.responses.SuccessResponse;
 import cz.cuni.mff.danekji1.calendar.server.storage.EventRepository;
 import cz.cuni.mff.danekji1.calendar.core.commands.CommandVisitor;
@@ -24,19 +26,17 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Sessio
      */
     @Override
     public Response visit(LoginCommand command, Session session) {
-//        // example of simple implementation
-//        if (session.isLoggedIn()) {
-//            return new ErrorResponse("Already logged in.");
-//        }
-//        User user = userRepository.authenticate(command.getUsername(), command.getPasswordHash());
-//        if (user != null) {
-//            session.setCurrentUser(user);
-//            return new SuccessResponse("Login successful.");
-//        } else {
-//            return new ErrorResponse("Invalid credentials.");
-//        }
-        throw new UnsupportedOperationException("LoginCommand not implemented yet.");
-        // todo: implement login command
+        if (session.isLoggedIn()) {
+            return new ErrorResponse("Already logged in as user '" + session.getCurrentUser().username() + "'.");
+        }
+
+        if (eventRepository.authenticate(command.username(), command.passwordHash())) {
+            User user = new User(command.username(), command.passwordHash());
+            session.setCurrentUser(user);
+            return new SuccessLoginResponse("Login as user '" + command.username() + "' is successful.", user);
+        } else {
+            return new ErrorResponse("Invalid credentials.");
+        }
     }
 
     /**
