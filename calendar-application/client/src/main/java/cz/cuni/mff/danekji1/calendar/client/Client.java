@@ -10,7 +10,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import cz.cuni.mff.danekji1.calendar.core.responses.SuccessResponse;
 import cz.cuni.mff.danekji1.calendar.client.ui.UserInterface;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -74,7 +73,8 @@ public class Client {
 
             return (Response) in.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            return new ErrorResponse("Failed to send command: " + e.getMessage());
+            LOGGER.fatal("Failed to send command", e);
+            return new ErrorResponse("Failed to send command");
         }
     }
 

@@ -5,9 +5,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import cz.cuni.mff.danekji1.calendar.core.commands.CommandVisitor;
 import cz.cuni.mff.danekji1.calendar.server.storage.XMLEventRepository;
@@ -25,8 +28,9 @@ public class Server {
     private static final Logger LOGGER = LogManager.getLogger(Server.class.getName());
 
     private final EventRepository eventRepository;
+    // todo: think about more logical solution
     private static final Random RANDOM = new Random(42);
-    private final Map<Integer, Session> sessions = new HashMap<>();
+    private final Map<Integer, Session> sessions = Collections.synchronizedMap(new HashMap<>());
 
     public Server(EventRepository eventRepository) {
         this.eventRepository = eventRepository;
@@ -37,11 +41,12 @@ public class Server {
      * Creates a new session for a client.
      * Each session is identified by a unique session ID.
      */
-    private int getUniqueSessionId() {
+    private synchronized int getUniqueSessionId() {
         int sessionId;
         do {
             sessionId = RANDOM.nextInt(Integer.MAX_VALUE);
         } while (sessions.containsKey(sessionId));
+
         return sessionId;
     }
 
@@ -51,19 +56,21 @@ public class Server {
      */
     public void start(int port) {
         // example of very simple implementation
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
+        try (ServerSocket serverSocket = new ServerSocket(port);
+             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             LOGGER.info("Server started on port {}", port);
-            Random random = new Random(42);
+
             while (true) {
                 // accept
                 Socket clientSocket = serverSocket.accept();
 
                 // create session
                 int sessionId = getUniqueSessionId();
-                sessions.put(sessionId, new Session(sessionId));
+                var prev = sessions.put(sessionId, new Session(sessionId));
+                assert prev == null;
 
-                // detach thread for client
-                new Thread(() -> handleClient(clientSocket, sessionId)).start();
+                // todo: clients limitation
+                executor.submit(() -> handleClient(clientSocket, sessionId));
             }
         } catch (Exception e) {
             LOGGER.fatal("Failed to start server on port '{}', because of '{}'", port, e);
@@ -71,12 +78,12 @@ public class Server {
     }
 
     /**
-     * Handles client connections.
+     * Handles client connections in separate thread.
      * Each client is assigned a session ID and can send commands to the server.
      */
     private void handleClient(Socket clientSocket, int sessionId) {
         // new session for each client
-        CommandVisitor<Response> commandDispatcher = new DefaultCommandDispatcher(sessions.get(sessionId), eventRepository);
+        CommandVisitor<Response, Session> commandDispatcher = new DefaultCommandDispatcher(eventRepository);
         try (ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
              ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream())) {
             // send sessionId to client
@@ -87,7 +94,7 @@ public class Server {
                 Command command = (Command) in.readObject();
                 LOGGER.debug("Received command: {}", command);
 
-                Response response = command.accept(commandDispatcher);
+                Response response = command.accept(commandDispatcher, sessions.get(sessionId));
                 out.writeObject(response);
                 out.flush();
                 LOGGER.debug("Sent response: {}", response);
@@ -96,6 +103,7 @@ public class Server {
             LOGGER.error("Error handling client: {}", e.getMessage());
         }
     }
+
 
     public static void main(String[] args) {
         Server server = new Server(

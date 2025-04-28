@@ -42,7 +42,7 @@ public final class CLIUserInterface implements UserInterface {
             try {
                 String prompt = formatUserPrompt(client.getUsername());
                 String inputCommand = promptForInput(prompt).trim();
-                Command command = CommandParser.parse(inputCommand, this);
+                Command command = CLICommandParser.parse(inputCommand, this);
 
                 Response response = client.sendCommand(command);
                 displayResponse(response);

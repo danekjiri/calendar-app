@@ -8,6 +8,7 @@ import cz.cuni.mff.danekji1.calendar.core.models.User;
 public final class Session {
     private User currentUser;
     private final int sessionId;
+    ///  todo: add some endofsession time
 
 
     public Session(int sessionId) {

@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 public final class XMLEventRepository implements EventRepository {
-    private final static Logger logger = LogManager.getLogger(XMLEventRepository.class);
+    private final static Logger LOGGER = LogManager.getLogger(XMLEventRepository.class);
 
     private final static Path XML_FILE_FOLDER = Path.of("./data");
 
@@ -21,7 +21,7 @@ public final class XMLEventRepository implements EventRepository {
             try {
                 Files.createDirectories(XML_FILE_FOLDER);
             } catch (IOException e) {
-                logger.fatal("Failed to create XML file folder", e);
+                LOGGER.fatal("Failed to create XML file folder", e);
             }
         }
     }
@@ -53,9 +53,9 @@ public final class XMLEventRepository implements EventRepository {
                     </calendar>
                     """.formatted(username, passwordHash)
                     );
-            logger.info("Created calendar for user '{}'", username);
+            LOGGER.info("Created calendar for user '{}'", username);
         } catch (IOException e) {
-            logger.debug("Failed to create calendar for user '{}'", username, e);
+            LOGGER.debug("Failed to create calendar for user '{}'", username, e);
             throw new XmlDatabaseException("Failed to create calendar for user '" + username + "'");
         }
     }

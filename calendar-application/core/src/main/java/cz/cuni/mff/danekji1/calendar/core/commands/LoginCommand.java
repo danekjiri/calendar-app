@@ -1,35 +1,14 @@
 package cz.cuni.mff.danekji1.calendar.core.commands;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+public record LoginCommand(String username, int passwordHash) implements Command {
 
-// might be record?
-public final class LoginCommand implements Command {
-    private final String username;
-    private final String passwordHash;
-
-    private LoginCommand(String username, String password) {
-        this.username = username;
-        // todo: hash the password
-        this.passwordHash = password;
-    }
-
-    public String getUsername() { return username; }
-    public String getPasswordHash() { return passwordHash; }
+    public static final String COMMAND_NAME = "login";
 
     /**
      * Helps to handle the command on the server side.
      */
     @Override
-    public <R> R accept(CommandVisitor<R> visitor) {
-        return visitor.visit(this);
-    }
-
-    /**
-     * Creates a finished LoginCommand by prompting the user.
-     */
-    public static LoginCommand create(InputStream in, OutputStream out) {
-        throw new UnsupportedOperationException("Not implemented yet");
-        // todo: implement this method
+    public <R, C> R accept(CommandVisitor<R, C> visitor, C context) {
+        return visitor.visit(this, context);
     }
 }

@@ -14,5 +14,5 @@ public interface Command extends Serializable {
      * @param <R> the response type
      * @return a response after execution
      */
-    <R> R accept(CommandVisitor<R> visitor);
+    <R, C> R accept(CommandVisitor<R, C> visitor, C context);
 }

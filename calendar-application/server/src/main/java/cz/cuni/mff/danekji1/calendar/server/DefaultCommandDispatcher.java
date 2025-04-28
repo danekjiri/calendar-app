@@ -4,18 +4,15 @@ import cz.cuni.mff.danekji1.calendar.core.exceptions.CalendarException;
 import cz.cuni.mff.danekji1.calendar.core.responses.ErrorResponse;
 import cz.cuni.mff.danekji1.calendar.core.responses.SuccessResponse;
 import cz.cuni.mff.danekji1.calendar.server.storage.EventRepository;
-import cz.cuni.mff.danekji1.calendar.core.commands.AddEventCommand;
 import cz.cuni.mff.danekji1.calendar.core.commands.CommandVisitor;
 import cz.cuni.mff.danekji1.calendar.core.commands.CreateAccountCommand;
 import cz.cuni.mff.danekji1.calendar.core.commands.LoginCommand;
 import cz.cuni.mff.danekji1.calendar.core.responses.Response;
 
-public class DefaultCommandDispatcher implements CommandVisitor<Response> {
-    private final Session session;
+public class DefaultCommandDispatcher implements CommandVisitor<Response, Session> {
     private final EventRepository eventRepository;
 
-    public DefaultCommandDispatcher(Session session, EventRepository eventRepository) {
-        this.session = session;
+    public DefaultCommandDispatcher(EventRepository eventRepository) {
         this.eventRepository = eventRepository;
     }
 
@@ -26,7 +23,7 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response> {
      * Otherwise, returns error response.
      */
     @Override
-    public Response visit(LoginCommand command) {
+    public Response visit(LoginCommand command, Session session) {
 //        // example of simple implementation
 //        if (session.isLoggedIn()) {
 //            return new ErrorResponse("Already logged in.");
@@ -49,7 +46,7 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response> {
      * Otherwise, returns error response.
      */
     @Override
-    public Response visit(CreateAccountCommand command) {
+    public Response visit(CreateAccountCommand command, Session session) {
         try {
             eventRepository.createAccount(command.username(), command.passwordHash());
         } catch (CalendarException e) {
@@ -64,10 +61,4 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response> {
      *  into the server (xml) event-database and returns successful response.
      * Otherwise, returns error response.
      */
-    @Override
-    public Response visit(AddEventCommand command) {
-        throw new UnsupportedOperationException("AddEventCommand not implemented yet.");
-        // todo: implement add command
-    }
-
 }
