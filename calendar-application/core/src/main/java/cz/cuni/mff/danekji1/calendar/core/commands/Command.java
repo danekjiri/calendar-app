@@ -9,7 +9,13 @@ import java.io.Serializable;
 public interface Command extends Serializable {
 
     /**
-     * Accepts a visitor which handles the command.
+     * Returns the privileges in which the command operates.
+     * @return the privileges
+     */
+    Privileges getPrivileges();
+
+    /**
+     * Accepts a visitor which handles the command on sever-side.
      * @param visitor the command visitor
      * @param <R> the response type
      * @return a response after execution

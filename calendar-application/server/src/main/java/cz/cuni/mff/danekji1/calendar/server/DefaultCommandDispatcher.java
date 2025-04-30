@@ -1,5 +1,6 @@
 package cz.cuni.mff.danekji1.calendar.server;
 
+import cz.cuni.mff.danekji1.calendar.core.commands.AddEventCommand;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.CalendarException;
 import cz.cuni.mff.danekji1.calendar.core.models.User;
 import cz.cuni.mff.danekji1.calendar.core.responses.ErrorResponse;
@@ -61,4 +62,17 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Sessio
      *  into the server (xml) event-database and returns successful response.
      * Otherwise, returns error response.
      */
+    @Override
+    public Response visit(AddEventCommand command, Session context) {
+        if (!context.isLoggedIn()) {
+            return new ErrorResponse("You must be logged in to add an event.");
+        }
+
+        try {
+            eventRepository.addEvent(context.getCurrentUser().username(), command.event());
+            return new SuccessResponse("Event added successfully.");
+        } catch (CalendarException e) {
+            return new ErrorResponse(e.getMessage());
+        }
+    }
 }

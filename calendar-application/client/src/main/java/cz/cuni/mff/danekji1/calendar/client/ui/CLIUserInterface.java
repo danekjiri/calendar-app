@@ -2,8 +2,8 @@ package cz.cuni.mff.danekji1.calendar.client.ui;
 
 import cz.cuni.mff.danekji1.calendar.client.Client;
 import cz.cuni.mff.danekji1.calendar.core.commands.Command;
-import cz.cuni.mff.danekji1.calendar.core.exceptions.InvalidInputException;
-import cz.cuni.mff.danekji1.calendar.core.exceptions.UnknownCommandException;
+import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InvalidInputException;
+import cz.cuni.mff.danekji1.calendar.core.exceptions.client.UnknownCommandException;
 import cz.cuni.mff.danekji1.calendar.core.models.User;
 import cz.cuni.mff.danekji1.calendar.core.responses.*;
 import org.apache.logging.log4j.LogManager;
@@ -30,8 +30,12 @@ public final class CLIUserInterface implements UserInterface {
         this.responseDispatcher = new DefaultCLIResponseDispatcher(this);
     }
 
-    public void setUser(User user) {
+    void setUser(User user) {
         this.user = user;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     /**
@@ -58,6 +62,8 @@ public final class CLIUserInterface implements UserInterface {
                 LOGGER.error("Failed to read command from user");
             } catch (UnknownCommandException | InvalidInputException e) {
                 LOGGER.error(e.getMessage());
+            } catch (Exception e) {
+                LOGGER.error("An unexpected error occurred: {}", e.getMessage());
             }
         }
     }

@@ -4,12 +4,18 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public record CreateAccountCommand(String username, int passwordHash) implements Command {
-    private static final Logger LOGGER = LogManager.getLogger(CreateAccountCommand.class);
-
     public static final String COMMAND_NAME = "create_account";
 
     /**
-     * Helps to handle the command on the server side.
+     * {@inheritDoc}
+     */
+    @Override
+    public Privileges getPrivileges() {
+        return Privileges.ALL;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public <R, C> R accept(CommandVisitor<R, C> visitor, C context) {

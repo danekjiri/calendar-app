@@ -15,14 +15,14 @@ public class DefaultCLIResponseDispatcher implements ResponseVisitor<Void> {
 
     @Override
     public Void visit(SuccessResponse response) {
-        LOGGER.info("Success: {}", response.getMessage());
+        LOGGER.info("Success: {}", response.message());
         return null;
     }
 
     @Override
     public Void visit(SuccessLoginResponse response) {
-        LOGGER.info("Success: {}", response.getMessage());
-        ui.setUser(response.getUser());
+        LOGGER.info("Success: {}", response.message());
+        ui.setUser(response.user());
         return null;
     }
 

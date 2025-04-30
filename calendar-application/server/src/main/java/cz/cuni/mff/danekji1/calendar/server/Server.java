@@ -28,7 +28,6 @@ public class Server {
     private static final Logger LOGGER = LogManager.getLogger(Server.class.getName());
 
     private final EventRepository eventRepository;
-    // todo: think about more logical solution
     private static final Random RANDOM = new Random(42);
     private final Map<Integer, Session> sessions = Collections.synchronizedMap(new HashMap<>());
 
@@ -55,7 +54,6 @@ public class Server {
      * Each connection is handled in a separate thread.
      */
     public void start(int port) {
-        // example of very simple implementation
         try (ServerSocket serverSocket = new ServerSocket(port);
              ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             LOGGER.info("Server started on port {}", port);

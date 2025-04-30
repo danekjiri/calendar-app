@@ -1,16 +1,14 @@
 package cz.cuni.mff.danekji1.calendar.server.storage;
 
-import cz.cuni.mff.danekji1.calendar.core.exceptions.InvalidInputException;
-import cz.cuni.mff.danekji1.calendar.core.exceptions.XmlDatabaseException;
+import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InvalidInputException;
+import cz.cuni.mff.danekji1.calendar.core.exceptions.server.ServerException;
+import cz.cuni.mff.danekji1.calendar.core.exceptions.server.XmlDatabaseException;
 import cz.cuni.mff.danekji1.calendar.core.models.Event;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,14 +21,16 @@ public final class XMLEventRepository implements EventRepository {
     private static final String USER_TAG = "user";
     private static final String USERNAME_TAG = "username";
     private static final String PASSWORD_HASH_TAG = "passwordHash";
+    private static final String NEXT_EVENT_ID_TAG = "nextEventId";
+    private static final String EVENTS_TAG = "events";
     private final static Path XML_FILE_FOLDER = Path.of("./data");
 
-    public XMLEventRepository() {
+    public XMLEventRepository() throws XmlDatabaseException {
         if (Files.notExists(XML_FILE_FOLDER)) {
             try {
                 Files.createDirectories(XML_FILE_FOLDER);
             } catch (IOException e) {
-                LOGGER.fatal("Failed to create XML file folder", e);
+                throw new XmlDatabaseException("Failed to create XML file folder");
             }
         }
     }
@@ -39,6 +39,14 @@ public final class XMLEventRepository implements EventRepository {
         return Path.of(XML_FILE_FOLDER + "/" + username + ".xml");
     }
 
+    /**
+     * Creates a new calendar for the user with the given username and password hash.
+     * The calendar is stored in an XML file with the username as the filename.
+     *
+     * @param username The username of the user.
+     * @param passwordHash The password hash of the user.
+     * @throws InvalidInputException if the username is null, empty, or "unlogged".
+     */
     @Override
     public void createAccount(String username, int passwordHash) {
         if (username == null || username.isEmpty() || username.equals("unlogged")) {
@@ -58,6 +66,7 @@ public final class XMLEventRepository implements EventRepository {
                             <username>%s</username>
                             <passwordHash>%d</passwordHash>
                        </user>
+                       <nextEventId>1</nextEventId>
                        <events></events>
                     </calendar>
                     """.formatted(username, passwordHash)
@@ -69,7 +78,7 @@ public final class XMLEventRepository implements EventRepository {
         }
     }
 
-    private static Element getUserCalendarRoot(Path file) {
+    private static Element getUserCalendarRoot(Path file) throws XmlDatabaseException {
         try {
             SAXBuilder builder = new SAXBuilder();
             var document = builder.build(file.toFile());
@@ -88,6 +97,14 @@ public final class XMLEventRepository implements EventRepository {
         }
     }
 
+    /**
+     * Authenticates a user with the given username and password hash.
+     * The method checks if the username exists and if the password hash matches.
+     *
+     * @param username The username of the user.
+     * @param passwordHash The password hash of the user.
+     * @return true if authentication is successful, false otherwise.
+     */
     @Override
     public synchronized boolean authenticate(String username, int passwordHash) {
         if (username == null || username.isEmpty() || username.equals("unlogged")) {
@@ -108,28 +125,56 @@ public final class XMLEventRepository implements EventRepository {
         return username.equals(usernameFromFile) && passwordHashFromFile == passwordHash;
     }
 
+    /**
+     * Adds an event to the user's calendar.
+     * The method increments <nextEventId></nextEventId> XML elements value and adds the event with it into the XML file.
+     *
+     * @param username The username of the user.
+     * @param event The event to add.
+     * @return The ID of the added event.
+     */
     @Override
-    public void addEvent(String username, Event event) {
+    public long addEvent(String username, Event event) {
+        if (username == null || username.isEmpty() || username.equals("unlogged")) {
+            throw new ServerException("Username cannot be null or empty or 'unlogged'");
+        }
 
+        if (!Files.exists(getUserFilePath(username))) {
+            throw new XmlDatabaseException("The calendar for username '" + username + "' does not exist");
+        }
+
+        var rootCalendar = getUserCalendarRoot(getUserFilePath(username));
+        var nextEventIdElement = rootCalendar.getChild(NEXT_EVENT_ID_TAG);
+        long nextEventId = Long.parseLong(nextEventIdElement.getText());
+
+        Event eventWithId = Event.withId(nextEventId, event);
+        nextEventIdElement.setText(String.valueOf(nextEventId + 1));
+
+        var eventsElement = rootCalendar.getChild(EVENTS_TAG);
+        eventsElement.addContent(eventWithId.toXML());
+
+        // todo: save the XML file
+        return event.getId();
     }
 
     @Override
     public void removeEvent(String username, Long eventId) {
+        throw new UnsupportedOperationException("Not implemented yet");
 
     }
 
     @Override
     public List<Event> getAllEvents(String username) {
-        return List.of();
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     public List<Event> getFutureEvents(String username) {
-        return List.of();
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     public void updateEvent(String username, Event event) {
-
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 }

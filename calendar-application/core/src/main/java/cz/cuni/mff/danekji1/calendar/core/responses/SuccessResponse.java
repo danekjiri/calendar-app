@@ -1,14 +1,6 @@
 package cz.cuni.mff.danekji1.calendar.core.responses;
 
-//  might be record?
-public class SuccessResponse implements Response {
-    private final String message;
-
-    public SuccessResponse(String message) {
-        this.message = message;
-    }
-
-    public String getMessage() { return message; }
+public record SuccessResponse(String message) implements Response {
 
     /**
      * Helps to handle the command on the client side when displaying response.
