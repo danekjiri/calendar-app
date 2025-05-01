@@ -1,9 +1,26 @@
 package cz.cuni.mff.danekji1.calendar.core.models;
 
+import cz.cuni.mff.danekji1.calendar.core.xml.XMLCalendarTags;
+import org.jdom2.Element;
+
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Represents a user in the system.
  * Contains username and password hash.
  */
-public record User(String username, int passwordHash) implements Serializable {  }
+public record User(String username, int passwordHash) implements Serializable {
+
+    public Element toXMLElement() {
+        Element userElement = new Element(XMLCalendarTags.USER_TAG);
+
+        Element usernameElement = new Element(XMLCalendarTags.USERNAME_TAG);
+        usernameElement.setText(String.valueOf(username));
+        Element passwordHashElement = new Element(XMLCalendarTags.PASSWORD_HASH_TAG);
+        passwordHashElement.setText(Integer.toString(passwordHash));
+
+        userElement.addContent(List.of(usernameElement, passwordHashElement));
+        return userElement;
+    }
+}

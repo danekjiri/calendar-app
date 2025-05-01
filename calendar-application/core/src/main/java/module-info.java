@@ -1,5 +1,6 @@
 module cz.cuni.mff.danekji.calendar.core {
     requires org.apache.logging.log4j;
+    requires org.jdom2;
 
     exports cz.cuni.mff.danekji1.calendar.core.commands;
     exports cz.cuni.mff.danekji1.calendar.core.responses;
@@ -7,4 +8,5 @@ module cz.cuni.mff.danekji.calendar.core {
     exports cz.cuni.mff.danekji1.calendar.core.exceptions;
     exports cz.cuni.mff.danekji1.calendar.core.exceptions.client;
     exports cz.cuni.mff.danekji1.calendar.core.exceptions.server;
+    exports cz.cuni.mff.danekji1.calendar.core.xml;
 }

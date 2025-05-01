@@ -18,6 +18,6 @@ public record AddEventCommand(Event event) implements Command {
      */
     @Override
     public <R, C> R accept(CommandVisitor<R, C> visitor, C context) {
-        return null;
+        return visitor.visit(this, context);
     }
 }

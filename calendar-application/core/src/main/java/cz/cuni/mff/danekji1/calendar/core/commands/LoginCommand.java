@@ -1,6 +1,8 @@
 package cz.cuni.mff.danekji1.calendar.core.commands;
 
-public record LoginCommand(String username, int passwordHash) implements Command {
+import cz.cuni.mff.danekji1.calendar.core.models.User;
+
+public record LoginCommand(User user) implements Command {
     public static final String COMMAND_NAME = "login";
 
     /**

@@ -9,6 +9,7 @@ import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InvalidInputExceptio
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.UnknownCommandException;
 
 import cz.cuni.mff.danekji1.calendar.core.models.Event;
+import cz.cuni.mff.danekji1.calendar.core.models.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -77,8 +78,8 @@ public final class CLICommandParser {
             throw new InvalidInputException("Password cannot be empty");
         }
 
-        int passwordHash = password.hashCode();
-        return new CreateAccountCommand(username, passwordHash);
+        User user = new User(username, password.hashCode());
+        return new CreateAccountCommand(user);
     }
 
     private static LoginCommand buildLoginCommand(CLIUserInterface ui) throws IOException, InvalidInputException {
@@ -92,8 +93,8 @@ public final class CLICommandParser {
             throw new InvalidInputException("Password cannot be empty");
         }
 
-        int passwordHash = password.hashCode();
-        return new LoginCommand(username, passwordHash);
+        User user = new User(username, password.hashCode());
+        return new LoginCommand(user);
     }
 
     private static AddEventCommand buildAddEventCommand(CLIUserInterface ui) throws IOException, InvalidInputException {

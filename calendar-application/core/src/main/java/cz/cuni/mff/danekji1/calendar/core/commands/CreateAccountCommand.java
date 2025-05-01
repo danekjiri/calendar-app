@@ -1,9 +1,9 @@
 package cz.cuni.mff.danekji1.calendar.core.commands;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-public record CreateAccountCommand(String username, int passwordHash) implements Command {
+import cz.cuni.mff.danekji1.calendar.core.models.User;
+
+public record CreateAccountCommand(User user) implements Command {
     public static final String COMMAND_NAME = "create_account";
 
     /**

@@ -12,6 +12,8 @@ import cz.cuni.mff.danekji1.calendar.core.commands.CreateAccountCommand;
 import cz.cuni.mff.danekji1.calendar.core.commands.LoginCommand;
 import cz.cuni.mff.danekji1.calendar.core.responses.Response;
 
+import java.io.IOException;
+
 public class DefaultCommandDispatcher implements CommandVisitor<Response, Session> {
     private final EventRepository eventRepository;
 
@@ -31,10 +33,9 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Sessio
             return new ErrorResponse("Already logged in as user '" + session.getCurrentUser().username() + "'.");
         }
 
-        if (eventRepository.authenticate(command.username(), command.passwordHash())) {
-            User user = new User(command.username(), command.passwordHash());
-            session.setCurrentUser(user);
-            return new SuccessLoginResponse("Login as user '" + command.username() + "' is successful.", user);
+        if (eventRepository.authenticate(command.user())) {
+            session.setCurrentUser(command.user());
+            return new SuccessLoginResponse("Login as user '" + command.user().username() + "' is successful.", command.user());
         } else {
             return new ErrorResponse("Invalid credentials.");
         }
@@ -49,11 +50,11 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Sessio
     @Override
     public Response visit(CreateAccountCommand command, Session session) {
         try {
-            eventRepository.createAccount(command.username(), command.passwordHash());
+            eventRepository.createAccount(command.user());
         } catch (CalendarException e) {
             return new ErrorResponse(e.getMessage());
         }
-        return new SuccessResponse("Account for account '" + command.username() + "' created successfully.");
+        return new SuccessResponse("Account for account '" + command.user().username() + "' created successfully.");
     }
 
     /**
@@ -69,9 +70,9 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Sessio
         }
 
         try {
-            eventRepository.addEvent(context.getCurrentUser().username(), command.event());
-            return new SuccessResponse("Event added successfully.");
-        } catch (CalendarException e) {
+            long newEventId = eventRepository.addEvent(context.getCurrentUser(), command.event());
+            return new SuccessResponse("Event with id '" + newEventId + "' added successfully.");
+        } catch (CalendarException | IOException e) {
             return new ErrorResponse(e.getMessage());
         }
     }
