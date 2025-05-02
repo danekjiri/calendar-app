@@ -2,7 +2,7 @@ package cz.cuni.mff.danekji1.calendar.client;
 
 import cz.cuni.mff.danekji1.calendar.client.ui.CLIUserInterface;
 import cz.cuni.mff.danekji1.calendar.core.commands.Command;
-import cz.cuni.mff.danekji1.calendar.core.responses.ErrorResponse;
+import cz.cuni.mff.danekji1.calendar.core.responses.error.ErrorResponse;
 import cz.cuni.mff.danekji1.calendar.core.responses.Response;
 
 import java.io.IOException;

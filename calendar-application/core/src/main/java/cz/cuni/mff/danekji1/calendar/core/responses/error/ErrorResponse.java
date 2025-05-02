@@ -1,4 +1,7 @@
-package cz.cuni.mff.danekji1.calendar.core.responses;
+package cz.cuni.mff.danekji1.calendar.core.responses.error;
+
+import cz.cuni.mff.danekji1.calendar.core.responses.Response;
+import cz.cuni.mff.danekji1.calendar.core.responses.ResponseVisitor;
 
 //  might be record?
 public final class ErrorResponse implements Response {

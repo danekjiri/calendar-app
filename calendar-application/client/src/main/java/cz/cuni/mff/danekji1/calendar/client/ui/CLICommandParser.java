@@ -1,9 +1,6 @@
 package cz.cuni.mff.danekji1.calendar.client.ui;
 
-import cz.cuni.mff.danekji1.calendar.core.commands.AddEventCommand;
-import cz.cuni.mff.danekji1.calendar.core.commands.Command;
-import cz.cuni.mff.danekji1.calendar.core.commands.CreateAccountCommand;
-import cz.cuni.mff.danekji1.calendar.core.commands.LoginCommand;
+import cz.cuni.mff.danekji1.calendar.core.commands.*;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InsufficientCommandPrivilegesException;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InvalidInputException;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.UnknownCommandException;
@@ -29,6 +26,7 @@ public final class CLICommandParser {
         registerCommand(CreateAccountCommand.COMMAND_NAME, CLICommandParser::buildCreateAccountCommand);
         registerCommand(LoginCommand.COMMAND_NAME, CLICommandParser::buildLoginCommand);
         registerCommand(AddEventCommand.COMMAND_NAME, CLICommandParser::buildAddEventCommand);
+        registerCommand(LogoutCommand.COMMAND_NAME, CLICommandParser::buildLogoutCommand);
         // Add other commands here
     }
 
@@ -136,4 +134,7 @@ public final class CLICommandParser {
         return new AddEventCommand(event);
     }
 
+    private static LogoutCommand buildLogoutCommand(CLIUserInterface ui) {
+        return new LogoutCommand();
+    }
 }

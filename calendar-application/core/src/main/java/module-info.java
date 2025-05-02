@@ -9,4 +9,6 @@ module cz.cuni.mff.danekji.calendar.core {
     exports cz.cuni.mff.danekji1.calendar.core.exceptions.client;
     exports cz.cuni.mff.danekji1.calendar.core.exceptions.server;
     exports cz.cuni.mff.danekji1.calendar.core.xml;
+    exports cz.cuni.mff.danekji1.calendar.core.responses.error;
+    exports cz.cuni.mff.danekji1.calendar.core.responses.success;
 }

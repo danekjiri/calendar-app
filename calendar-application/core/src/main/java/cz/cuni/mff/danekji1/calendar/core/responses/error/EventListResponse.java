@@ -1,6 +1,9 @@
-package cz.cuni.mff.danekji1.calendar.core.responses;
+package cz.cuni.mff.danekji1.calendar.core.responses.error;
 
 import cz.cuni.mff.danekji1.calendar.core.models.Event;
+import cz.cuni.mff.danekji1.calendar.core.responses.Response;
+import cz.cuni.mff.danekji1.calendar.core.responses.ResponseVisitor;
+
 import java.util.List;
 
 // might be record?

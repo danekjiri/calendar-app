@@ -92,6 +92,7 @@ public class Server {
                 Command command = (Command) in.readObject();
                 LOGGER.debug("Received command: {}", command);
 
+                Session session = sessions.get(sessionId);
                 Response response = command.accept(commandDispatcher, sessions.get(sessionId));
                 out.writeObject(response);
                 out.flush();

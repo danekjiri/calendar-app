@@ -1,4 +1,7 @@
-package cz.cuni.mff.danekji1.calendar.core.responses;
+package cz.cuni.mff.danekji1.calendar.core.responses.success;
+
+import cz.cuni.mff.danekji1.calendar.core.responses.Response;
+import cz.cuni.mff.danekji1.calendar.core.responses.ResponseVisitor;
 
 public record SuccessResponse(String message) implements Response {
 

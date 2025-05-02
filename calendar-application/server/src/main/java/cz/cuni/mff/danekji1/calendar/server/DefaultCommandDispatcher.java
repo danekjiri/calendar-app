@@ -1,15 +1,12 @@
 package cz.cuni.mff.danekji1.calendar.server;
 
-import cz.cuni.mff.danekji1.calendar.core.commands.AddEventCommand;
+import cz.cuni.mff.danekji1.calendar.core.commands.*;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.CalendarException;
-import cz.cuni.mff.danekji1.calendar.core.models.User;
-import cz.cuni.mff.danekji1.calendar.core.responses.ErrorResponse;
-import cz.cuni.mff.danekji1.calendar.core.responses.SuccessLoginResponse;
-import cz.cuni.mff.danekji1.calendar.core.responses.SuccessResponse;
+import cz.cuni.mff.danekji1.calendar.core.responses.error.ErrorResponse;
+import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessLoginResponse;
+import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessLogoutResponse;
+import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessResponse;
 import cz.cuni.mff.danekji1.calendar.server.storage.EventRepository;
-import cz.cuni.mff.danekji1.calendar.core.commands.CommandVisitor;
-import cz.cuni.mff.danekji1.calendar.core.commands.CreateAccountCommand;
-import cz.cuni.mff.danekji1.calendar.core.commands.LoginCommand;
 import cz.cuni.mff.danekji1.calendar.core.responses.Response;
 
 import java.io.IOException;
@@ -76,4 +73,15 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Sessio
             return new ErrorResponse(e.getMessage());
         }
     }
+
+    @Override
+    public Response visit(LogoutCommand command, Session context) {
+        if (!context.isLoggedIn()) {
+            return new ErrorResponse("You are not logged in.");
+        }
+
+        context.setCurrentUser(null);
+        return new SuccessLogoutResponse("Logout successful.");
+    }
+
 }

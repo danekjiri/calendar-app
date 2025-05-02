@@ -5,4 +5,5 @@ module cz.cuni.mff.danekji.calendar.server {
     requires java.xml;
     requires org.jdom2;
     requires java.sql;
+    requires jdk.jshell;
 }

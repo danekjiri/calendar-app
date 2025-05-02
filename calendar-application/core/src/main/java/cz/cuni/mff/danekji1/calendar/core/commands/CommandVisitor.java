@@ -7,5 +7,6 @@ public interface CommandVisitor<R, C> {
     R visit(LoginCommand command, C context);
     R visit(CreateAccountCommand command, C context);
     R visit(AddEventCommand command, C context);
+    R visit(LogoutCommand command, C context);
     // more to be added as needed...
 }
