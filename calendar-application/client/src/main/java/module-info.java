@@ -3,6 +3,6 @@ module cz.cuni.mff.danekji.calendar.client {
     requires org.apache.logging.log4j;
     requires jdk.jshell;
 
-    exports cz.cuni.mff.danekji1.calendar.client.ui;
-    exports cz.cuni.mff.danekji1.calendar.client;
+    exports cz.cuni.mff.danekji1.calendar.client.cli.ui;
+    exports cz.cuni.mff.danekji1.calendar.client.cli;
 }

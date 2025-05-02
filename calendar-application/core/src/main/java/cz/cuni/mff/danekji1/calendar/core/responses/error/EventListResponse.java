@@ -20,7 +20,7 @@ public final class EventListResponse implements Response {
      * Helps to handle the command on the client side when displaying response.
      */
     @Override
-    public <R> R accept(ResponseVisitor<R> visitor) {
-        return visitor.visit(this);
+    public <R, C> R accept(ResponseVisitor<R, C> visitor, C context) {
+        return visitor.visit(this, context);
     }
 }

@@ -1,7 +1,31 @@
 package cz.cuni.mff.danekji1.calendar.core.commands;
 
-public record LogoutCommand() implements Command {
+import cz.cuni.mff.danekji1.calendar.core.ui.ClientState;
+import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
+
+public final class LogoutCommand implements Command {
     public static final String COMMAND_NAME = "logout";
+
+    @Override
+    public Command buildCommand(UserInterface ui, ClientState context) {
+        return new LogoutCommand();
+    }
+
+    public LogoutCommand() {
+    }
+
+    @Override
+    public String getName() {
+        return COMMAND_NAME;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDescription() {
+        return "logout: Logout from current logged account.";
+    }
 
     /**
      * {@inheritDoc}

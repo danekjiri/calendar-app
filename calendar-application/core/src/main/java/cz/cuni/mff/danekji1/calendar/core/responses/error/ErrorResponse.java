@@ -2,6 +2,7 @@ package cz.cuni.mff.danekji1.calendar.core.responses.error;
 
 import cz.cuni.mff.danekji1.calendar.core.responses.Response;
 import cz.cuni.mff.danekji1.calendar.core.responses.ResponseVisitor;
+import cz.cuni.mff.danekji1.calendar.core.ui.ClientState;
 
 //  might be record?
 public final class ErrorResponse implements Response {
@@ -17,7 +18,7 @@ public final class ErrorResponse implements Response {
      * Helps to handle the command on the client side when displaying response.
      */
     @Override
-    public <R> R accept(ResponseVisitor<R> visitor) {
-        return visitor.visit(this);
+    public <R, C> R accept(ResponseVisitor<R, C> visitor, C context) {
+        return visitor.visit(this, context);
     }
 }

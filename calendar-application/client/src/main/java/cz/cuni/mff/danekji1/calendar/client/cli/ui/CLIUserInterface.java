@@ -1,10 +1,11 @@
-package cz.cuni.mff.danekji1.calendar.client.ui;
+package cz.cuni.mff.danekji1.calendar.client.cli.ui;
 
-import cz.cuni.mff.danekji1.calendar.client.Client;
+import cz.cuni.mff.danekji1.calendar.core.Client;
+import cz.cuni.mff.danekji1.calendar.core.ui.ClientState;
+import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
 import cz.cuni.mff.danekji1.calendar.core.commands.Command;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InvalidInputException;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.UnknownCommandException;
-import cz.cuni.mff.danekji1.calendar.core.models.User;
 import cz.cuni.mff.danekji1.calendar.core.responses.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,22 +21,12 @@ public final class CLIUserInterface implements UserInterface {
 
     private final Scanner userInput;
     private final OutputStreamWriter userOutput;
-    private final ResponseVisitor<Void> responseDispatcher;
-
-    private User user = null;
+    private final ResponseVisitor<Void, ClientState> responseDispatcher;
 
     public CLIUserInterface(InputStream userInput, OutputStream userOutput) {
         this.userInput = new Scanner(userInput);
         this.userOutput = new OutputStreamWriter(userOutput);
-        this.responseDispatcher = new DefaultCLIResponseDispatcher(this);
-    }
-
-    void setUser(User user) {
-        this.user = user;
-    }
-
-    public User getUser() {
-        return user;
+        this.responseDispatcher = new DefaultCLIResponseDispatcher();
     }
 
     /**
@@ -52,12 +43,12 @@ public final class CLIUserInterface implements UserInterface {
         LOGGER.debug("Starting user interface, waiting for commands...");
         while(client.isConnectionOpen()) {
             try {
-                String prompt = formatUserPrompt();
+                String prompt = formatUserPrompt(client.getCurrentSession());
                 String inputCommand = promptForInput(prompt).trim();
-                Command command = CLICommandParser.parse(inputCommand, this);
 
+                Command command = CLICommandParser.parse(inputCommand, this, client.getCurrentSession());
                 Response response = client.sendCommand(command);
-                displayResponse(response);
+                displayResponse(response, client.getCurrentSession());
             } catch (IOException e) {
                 LOGGER.error("Failed to read command from user");
             } catch (UnknownCommandException | InvalidInputException e) {
@@ -72,8 +63,9 @@ public final class CLIUserInterface implements UserInterface {
      * Formats the prompt for the user.
      * The prompt includes the username and a fixed string.
      */
-    private String formatUserPrompt() {
-        return String.format("\n$%s@calendar> ", user != null ? user.username() : "unlogged");
+    private String formatUserPrompt(ClientState session) {
+        return String.format("\n$%s@calendar> ", session.getCurrentUser() != null
+                ? session.getCurrentUser().username() : "unlogged");
     }
 
     /**
@@ -81,8 +73,8 @@ public final class CLIUserInterface implements UserInterface {
      * This method uses the Visitor pattern to handle different types of responses.
      */
     @Override
-    public void displayResponse(Response response) {
-        response.accept(responseDispatcher);
+    public void displayResponse(Response response, ClientState session) {
+        response.accept(responseDispatcher, session);
     }
 
     @Override
@@ -92,4 +84,27 @@ public final class CLIUserInterface implements UserInterface {
 
         return userInput.nextLine();
     }
+
+//    public void displayHelp() {
+//        tr {
+//            userOutput.write("Available commands:\n");
+//        } catch (IOException e) {
+//            LOGGER.error("Failed to write help message");
+//            return;
+//        }
+//
+//        for (var commandClass : Command.class.getDeclaredClasses()) {
+//            try {
+//                var commandInstance = (Command) commandClass.getDeclaredConstructor().newInstance();
+//                Privileges currentPrivileges = user == null ? Privileges.UNLOGGED : Privileges.LOGGED;
+//                if (commandInstance.getPrivileges() == Privileges.ALL || currentPrivileges == commandInstance.getPrivileges()) {
+//                    userOutput.write(commandInstance.getDescription() + "\n");
+//                }
+//            } catch (Exception e) {
+//                LOGGER.error("Failed to write help message");
+//            }
+//        }
+//
+//    }
+
 }

@@ -1,4 +1,4 @@
-package cz.cuni.mff.danekji1.calendar.client;
+package cz.cuni.mff.danekji1.calendar.client.cli;
 
 import org.junit.jupiter.api.Test;
 

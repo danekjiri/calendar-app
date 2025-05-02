@@ -1,7 +1,7 @@
-package cz.cuni.mff.danekji1.calendar.client.ui;
+package cz.cuni.mff.danekji1.calendar.core.ui;
 
-import cz.cuni.mff.danekji1.calendar.client.Client;
 import cz.cuni.mff.danekji1.calendar.core.responses.Response;
+import cz.cuni.mff.danekji1.calendar.core.Client;
 
 import java.io.IOException;
 
@@ -10,6 +10,7 @@ import java.io.IOException;
  */
 public interface UserInterface {
     void start(Client client);
-    void displayResponse(Response response);
+    void displayResponse(Response response, ClientState session);
     String promptForInput(String message) throws IOException;
+
 }

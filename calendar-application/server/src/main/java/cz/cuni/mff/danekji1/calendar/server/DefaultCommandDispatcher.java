@@ -30,9 +30,9 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Sessio
             return new ErrorResponse("Already logged in as user '" + session.getCurrentUser().username() + "'.");
         }
 
-        if (eventRepository.authenticate(command.user())) {
-            session.setCurrentUser(command.user());
-            return new SuccessLoginResponse("Login as user '" + command.user().username() + "' is successful.", command.user());
+        if (eventRepository.authenticate(command.getUser())) {
+            session.setCurrentUser(command.getUser());
+            return new SuccessLoginResponse("Login as user '" + command.getUser().username() + "' is successful.", command.getUser());
         } else {
             return new ErrorResponse("Invalid credentials.");
         }
@@ -47,11 +47,11 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Sessio
     @Override
     public Response visit(CreateAccountCommand command, Session session) {
         try {
-            eventRepository.createAccount(command.user());
+            eventRepository.createAccount(command.getUser());
         } catch (CalendarException e) {
             return new ErrorResponse(e.getMessage());
         }
-        return new SuccessResponse("Account for account '" + command.user().username() + "' created successfully.");
+        return new SuccessResponse("Account for account '" + command.getUser().username() + "' created successfully.");
     }
 
     /**
@@ -67,7 +67,7 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Sessio
         }
 
         try {
-            long newEventId = eventRepository.addEvent(context.getCurrentUser(), command.event());
+            long newEventId = eventRepository.addEvent(context.getCurrentUser(), command.getEvent());
             return new SuccessResponse("Event with id '" + newEventId + "' added successfully.");
         } catch (CalendarException | IOException e) {
             return new ErrorResponse(e.getMessage());
@@ -84,4 +84,21 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Sessio
         return new SuccessLogoutResponse("Logout successful.");
     }
 
+//    @Override
+//    public Response visit(HelpCommand command, Session context) {
+//        StringBuilder helpMessage = new StringBuilder("Available commands:\n");
+//        for (var commandClass : Command.class.getDeclaredClasses()) {
+//            try {
+//                var commandInstance = (Command) commandClass.getDeclaredConstructor().newInstance();
+//                Privileges currentPrivileges = context.getCurrentUser() == null ? Privileges.UNLOGGED : Privileges.LOGGED;
+//                if (commandInstance.getPrivileges() == Privileges.ALL || currentPrivileges == commandInstance.getPrivileges()) {
+//                    helpMessage.append(commandInstance.getDescription()).append("\n");
+//                }
+//            } catch (Exception e) {
+//                return new ErrorResponse("Error while generating help message");
+//            }
+//        }
+//
+//        return new SuccessResponse(helpMessage.toString());
+//    }
 }

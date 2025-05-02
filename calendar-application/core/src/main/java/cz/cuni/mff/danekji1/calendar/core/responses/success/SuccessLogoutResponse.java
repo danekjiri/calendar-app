@@ -6,7 +6,7 @@ import cz.cuni.mff.danekji1.calendar.core.responses.ResponseVisitor;
 public record SuccessLogoutResponse(String message) implements Response {
 
     @Override
-    public <R> R accept(ResponseVisitor<R> visitor) {
-        return visitor.visit(this);
+    public <R, C> R accept(ResponseVisitor<R, C> visitor, C context) {
+        return visitor.visit(this, context);
     }
 }

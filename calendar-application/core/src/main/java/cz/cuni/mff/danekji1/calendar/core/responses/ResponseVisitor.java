@@ -9,11 +9,11 @@ import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessResponse;
 /**
  * Visitor interface for processing responses on client side.
  */
-public interface ResponseVisitor<R> {
-    R visit(SuccessResponse response);
-    R visit(SuccessLoginResponse response);
-    R visit(SuccessLogoutResponse response);
+public interface ResponseVisitor<R, C> {
+    R visit(SuccessResponse response, C context);
+    R visit(SuccessLoginResponse response, C context);
+    R visit(SuccessLogoutResponse response, C context);
 
-    R visit(ErrorResponse response);
-    R visit(EventListResponse response);
+    R visit(ErrorResponse response, C context);
+    R visit(EventListResponse response, C context);
 }

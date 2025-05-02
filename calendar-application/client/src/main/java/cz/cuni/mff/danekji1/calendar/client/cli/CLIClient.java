@@ -1,37 +1,50 @@
-package cz.cuni.mff.danekji1.calendar.client;
+package cz.cuni.mff.danekji1.calendar.client.cli;
 
-import cz.cuni.mff.danekji1.calendar.client.ui.CLIUserInterface;
+import cz.cuni.mff.danekji1.calendar.client.cli.ui.CLIUserInterface;
 import cz.cuni.mff.danekji1.calendar.core.commands.Command;
 import cz.cuni.mff.danekji1.calendar.core.responses.error.ErrorResponse;
 import cz.cuni.mff.danekji1.calendar.core.responses.Response;
+import cz.cuni.mff.danekji1.calendar.core.Client;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import cz.cuni.mff.danekji1.calendar.client.ui.UserInterface;
+import cz.cuni.mff.danekji1.calendar.core.ui.ClientState;
+import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
  * Handles network communication with the server.
  */
-public class Client {
-    private static final Logger LOGGER = LogManager.getLogger(Client.class);
+public final class CLIClient implements Client {
+    private static final Logger LOGGER = LogManager.getLogger(CLIClient.class);
 
     private Socket socket;
     private ObjectOutputStream out;
     private ObjectInputStream in;
     private final UserInterface ui;
-    private int sessionId;
+    private ClientSession session;
 
     public boolean isConnectionOpen() {
         return socket != null &&  socket.isConnected() && !socket.isClosed();
     }
 
-    public Client(UserInterface ui) {
+    public CLIClient(UserInterface ui) {
         this.ui = ui;
+    }
+
+    @Override
+    public ClientState getCurrentSession() {
+        assert session != null;
+        return session;
+    }
+
+    @Override
+    public void disconnect() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
@@ -44,7 +57,8 @@ public class Client {
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
 
-            sessionId = (int) in.readObject();
+            int sessionId = (int) in.readObject();
+            session = new ClientSession(sessionId);
             LOGGER.info("Connected to '{}:{}' with sessionId '{}'", host, port, sessionId);
         } catch (Exception e) {
             LOGGER.fatal("Failed to connect to '{}:{}', because of '{}'", host, port, e);
@@ -79,7 +93,7 @@ public class Client {
     public static void main(String[] args) {
         UserInterface ui = new CLIUserInterface(System.in, System.out);
 
-        Client client = new Client(ui);
+        Client client = new CLIClient(ui);
         client.connect("127.0.0.1", 8080);
         client.start();
     }
