@@ -1,9 +1,9 @@
 package cz.cuni.mff.danekji1.calendar.client.cli.ui;
 
 import cz.cuni.mff.danekji1.calendar.core.Client;
+import cz.cuni.mff.danekji1.calendar.core.commands.*;
 import cz.cuni.mff.danekji1.calendar.core.ui.ClientState;
 import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
-import cz.cuni.mff.danekji1.calendar.core.commands.Command;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InvalidInputException;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.UnknownCommandException;
 import cz.cuni.mff.danekji1.calendar.core.responses.*;
@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -22,11 +23,25 @@ public final class CLIUserInterface implements UserInterface {
     private final Scanner userInput;
     private final OutputStreamWriter userOutput;
     private final ResponseVisitor<Void, ClientState> responseDispatcher;
+    private final CLICommandParser parser;
 
     public CLIUserInterface(InputStream userInput, OutputStream userOutput) {
         this.userInput = new Scanner(userInput);
         this.userOutput = new OutputStreamWriter(userOutput);
         this.responseDispatcher = new DefaultCLIResponseDispatcher();
+
+        this.parser = new CLICommandParser();
+        // Register all commands
+        parser.registerCommand(CreateAccountCommand.COMMAND_NAME, CreateAccountCommand.class);
+        parser.registerCommand(LoginCommand.COMMAND_NAME, LoginCommand.class);
+        parser.registerCommand(AddEventCommand.COMMAND_NAME, AddEventCommand.class);
+        parser.registerCommand(LogoutCommand.COMMAND_NAME, LogoutCommand.class);
+        parser.registerCommand(HelpCommand.COMMAND_NAME, HelpCommand.class);
+    }
+
+    @Override
+    public Map<String, Class<? extends Command>> getCommandRegistry() {
+        return parser.getCommandRegistry();
     }
 
     /**
@@ -40,23 +55,31 @@ public final class CLIUserInterface implements UserInterface {
            return;
         }
 
-        LOGGER.debug("Starting user interface, waiting for commands...");
-        while(client.isConnectionOpen()) {
-            try {
+        try {
+            displayHelpMessage(client);
+
+            LOGGER.debug("Starting user interface, waiting for commands...");
+            while(client.isConnectionOpen()) {
                 String prompt = formatUserPrompt(client.getCurrentSession());
                 String inputCommand = promptForInput(prompt).trim();
 
-                Command command = CLICommandParser.parse(inputCommand, this, client.getCurrentSession());
+                Command command = parser.parse(inputCommand, this, client.getCurrentSession());
                 Response response = client.sendCommand(command);
                 displayResponse(response, client.getCurrentSession());
-            } catch (IOException e) {
-                LOGGER.error("Failed to read command from user");
-            } catch (UnknownCommandException | InvalidInputException e) {
-                LOGGER.error(e.getMessage());
-            } catch (Exception e) {
-                LOGGER.error("An unexpected error occurred: {}", e.getMessage());
             }
+        } catch (IOException e) {
+            LOGGER.error("Failed to read command from user");
+        } catch (UnknownCommandException | InvalidInputException e) {
+            LOGGER.error(e.getMessage());
+        } catch (Exception e) {
+            LOGGER.error("An unexpected error occurred: {}", e.getMessage());
         }
+    }
+
+    private void displayHelpMessage(Client client) {
+        Command helpCommand = new HelpCommand(parser.getCommandRegistry());
+        Response helpResponse = client.sendCommand(helpCommand);
+        displayResponse(helpResponse, client.getCurrentSession());
     }
 
     /**
@@ -84,27 +107,4 @@ public final class CLIUserInterface implements UserInterface {
 
         return userInput.nextLine();
     }
-
-//    public void displayHelp() {
-//        tr {
-//            userOutput.write("Available commands:\n");
-//        } catch (IOException e) {
-//            LOGGER.error("Failed to write help message");
-//            return;
-//        }
-//
-//        for (var commandClass : Command.class.getDeclaredClasses()) {
-//            try {
-//                var commandInstance = (Command) commandClass.getDeclaredConstructor().newInstance();
-//                Privileges currentPrivileges = user == null ? Privileges.UNLOGGED : Privileges.LOGGED;
-//                if (commandInstance.getPrivileges() == Privileges.ALL || currentPrivileges == commandInstance.getPrivileges()) {
-//                    userOutput.write(commandInstance.getDescription() + "\n");
-//                }
-//            } catch (Exception e) {
-//                LOGGER.error("Failed to write help message");
-//            }
-//        }
-//
-//    }
-
 }

@@ -16,5 +16,6 @@ module cz.cuni.mff.danekji.calendar.core {
     exports cz.cuni.mff.danekji1.calendar.core;
 
     opens cz.cuni.mff.danekji1.calendar.core.commands
-            to cz.cuni.mff.danekji.calendar.client;
+            to cz.cuni.mff.danekji.calendar.client,
+            cz.cuni.mff.danekji.calendar.server;
 }

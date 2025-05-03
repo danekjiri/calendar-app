@@ -8,10 +8,14 @@ import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessLogoutRespons
 import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessResponse;
 import cz.cuni.mff.danekji1.calendar.server.storage.EventRepository;
 import cz.cuni.mff.danekji1.calendar.core.responses.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 
 public class DefaultCommandDispatcher implements CommandVisitor<Response, Session> {
+    private static final Logger LOGGER = LogManager.getLogger(DefaultCommandDispatcher.class);
     private final EventRepository eventRepository;
 
     public DefaultCommandDispatcher(EventRepository eventRepository) {
@@ -84,21 +88,26 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Sessio
         return new SuccessLogoutResponse("Logout successful.");
     }
 
-//    @Override
-//    public Response visit(HelpCommand command, Session context) {
-//        StringBuilder helpMessage = new StringBuilder("Available commands:\n");
-//        for (var commandClass : Command.class.getDeclaredClasses()) {
-//            try {
-//                var commandInstance = (Command) commandClass.getDeclaredConstructor().newInstance();
-//                Privileges currentPrivileges = context.getCurrentUser() == null ? Privileges.UNLOGGED : Privileges.LOGGED;
-//                if (commandInstance.getPrivileges() == Privileges.ALL || currentPrivileges == commandInstance.getPrivileges()) {
-//                    helpMessage.append(commandInstance.getDescription()).append("\n");
-//                }
-//            } catch (Exception e) {
-//                return new ErrorResponse("Error while generating help message");
-//            }
-//        }
-//
-//        return new SuccessResponse(helpMessage.toString());
-//    }
+    @Override
+    public Response visit(HelpCommand command, Session context) {
+        StringBuilder helpMessage = new StringBuilder();
+        helpMessage.append("Available commands:\n");
+
+        for (var commandClass : command.getAvailableCommands().values()) {
+            try {
+                Constructor<? extends Command> constructor = commandClass.getDeclaredConstructor();
+                constructor.setAccessible(true);
+                Command tempCommand = constructor.newInstance();
+
+                Privileges currentPrivileges = context.isLoggedIn() ? Privileges.LOGGED : Privileges.UNLOGGED;
+                if (tempCommand.getPrivileges() == Privileges.ALL || tempCommand.getPrivileges() == currentPrivileges) {
+                    helpMessage.append(tempCommand.getName()).append(": ").append(tempCommand.getDescription()).append("\n");
+                }
+            } catch (Exception e) {
+                LOGGER.error("Failed to create command instance for: {}", commandClass.getSimpleName(), e);
+                return new ErrorResponse("Failed to generate help message.");
+            }
+        }
+        return new SuccessResponse(helpMessage.toString());
+    }
 }
