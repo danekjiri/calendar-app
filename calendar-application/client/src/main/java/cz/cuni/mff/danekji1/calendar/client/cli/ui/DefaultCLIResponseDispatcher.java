@@ -10,41 +10,58 @@ import cz.cuni.mff.danekji1.calendar.core.ui.ClientState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+
 public class DefaultCLIResponseDispatcher implements ResponseVisitor<Void, ClientState> {
     private static final Logger LOGGER = LogManager.getLogger(DefaultCLIResponseDispatcher.class);
 
+    private final OutputStreamWriter output;
+
+    public DefaultCLIResponseDispatcher(OutputStream output) {
+        this.output = new OutputStreamWriter(output);
+    }
+
     @Override
-    public Void visit(SuccessResponse response, ClientState session) {
-        LOGGER.info("Success: {}", response.message());
+    public Void visit(SuccessResponse response, ClientState session) throws IOException {
+        output.write(response.message() + "\n");
+        output.flush();
         return null;
     }
 
     @Override
-    public Void visit(SuccessLoginResponse response, ClientState session) {
-        LOGGER.info("Success: {}", response.message());
+    public Void visit(SuccessLoginResponse response, ClientState session) throws IOException {
+        output.write(response.message() + "\n");
         session.setCurrentUser(response.user());
+        output.flush();
         return null;
     }
 
     @Override
-    public Void visit(SuccessLogoutResponse response, ClientState session) {
-        LOGGER.info("Success: {}", response.message());
+    public Void visit(SuccessLogoutResponse response, ClientState session) throws IOException {
+        output.write(response.message() + "\n");
         session.unsetCurrentUser();
+        output.flush();
         return null;
     }
 
     @Override
-    public Void visit(ErrorResponse response, ClientState session) {
-        LOGGER.error("Error: {}", response.errorMessage());
+    public Void visit(ErrorResponse response, ClientState session) throws IOException {
+        output.write(response.errorMessage() + "\n");
+        output.flush();
         return null;
     }
 
     @Override
-    public Void visit(SuccessEventListResponse response, ClientState session) {
-        LOGGER.info("Successfully retrieved events:");
+    public Void visit(SuccessEventListResponse response, ClientState session) throws IOException {
+        output.write("Event list:\n");
         for (var event : response.events()) {
-            LOGGER.info("Event: {}", event);
+            output.write("\t");
+            output.write(event.toString());
+            output.write("\n");
         }
+        output.flush();
         return null;
     }
 }

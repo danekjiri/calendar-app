@@ -28,7 +28,7 @@ public final class CLIUserInterface implements UserInterface {
     public CLIUserInterface(InputStream userInput, OutputStream userOutput) {
         this.userInput = new Scanner(userInput);
         this.userOutput = new OutputStreamWriter(userOutput);
-        this.responseDispatcher = new DefaultCLIResponseDispatcher();
+        this.responseDispatcher = new DefaultCLIResponseDispatcher(userOutput);
 
         this.parser = new CLICommandParser();
         // Register all commands
@@ -68,7 +68,7 @@ public final class CLIUserInterface implements UserInterface {
                 Response response = client.sendCommand(command);
                 displayResponse(response, client.getCurrentSession());
             } catch (IOException e) {
-                LOGGER.error("Failed to read command from user");
+                LOGGER.error("Failed to read command from user or display response: {}", e.getMessage());
             } catch (UnknownCommandException | InvalidInputException e) {
                 LOGGER.error(e.getMessage());
             } catch (Exception e) {
@@ -101,7 +101,7 @@ public final class CLIUserInterface implements UserInterface {
      * This method uses the Visitor pattern to handle different types of responses.
      */
     @Override
-    public void displayResponse(Response response, ClientState session) {
+    public void displayResponse(Response response, ClientState session) throws IOException {
         response.accept(responseDispatcher, session);
     }
 

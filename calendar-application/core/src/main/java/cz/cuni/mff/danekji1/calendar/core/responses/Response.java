@@ -1,5 +1,6 @@
 package cz.cuni.mff.danekji1.calendar.core.responses;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -7,5 +8,5 @@ import java.io.Serializable;
  * Also supports the Visitor pattern.
  */
 public interface Response extends Serializable {
-    <R, C> R accept(ResponseVisitor<R, C> visitor, C context);
+    <R, C> R accept(ResponseVisitor<R, C> visitor, C context) throws IOException;
 }

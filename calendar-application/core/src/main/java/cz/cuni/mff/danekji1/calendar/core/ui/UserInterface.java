@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public interface UserInterface {
     void start(Client client);
-    void displayResponse(Response response, ClientState session);
+    void displayResponse(Response response, ClientState session) throws IOException;
     String promptForInput(String message) throws IOException;
     Map<String, Class<? extends Command>> getCommandRegistry();
 }
