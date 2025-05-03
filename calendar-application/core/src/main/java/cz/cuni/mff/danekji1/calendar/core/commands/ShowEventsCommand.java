@@ -4,7 +4,7 @@ import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InsufficientCommandP
 import cz.cuni.mff.danekji1.calendar.core.ui.ClientState;
 import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
 
-public class ShowEventsCommand implements Command {
+public final class ShowEventsCommand implements Command {
     public static final String COMMAND_NAME = "show_events";
 
     private ShowEventsCommand() {}

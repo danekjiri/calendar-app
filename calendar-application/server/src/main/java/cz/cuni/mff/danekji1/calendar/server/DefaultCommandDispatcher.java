@@ -10,11 +10,9 @@ import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessLogoutRespons
 import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessResponse;
 import cz.cuni.mff.danekji1.calendar.server.storage.EventRepository;
 import cz.cuni.mff.danekji1.calendar.core.responses.Response;
-import cz.cuni.mff.danekji1.calendar.server.storage.XMLEventRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 
@@ -141,6 +139,20 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Sessio
             return new SuccessResponse("Event with id '" + command.getEventId() + "' deleted successfully.");
         } catch (XmlDatabaseException e) {
             return new ErrorResponse("Failed to delete event: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Response visit(UpdateEventCommand command, Session context) {
+        if (!context.isLoggedIn()) {
+            return new ErrorResponse("You must be logged in to update an event.");
+        }
+
+        try {
+            eventRepository.updateEvent(context.getCurrentUser(), command.getEvent());
+            return new SuccessResponse("Event with id '" + command.getEvent().getId() + "' updated successfully.");
+        } catch (XmlDatabaseException e) {
+            return new ErrorResponse("Failed to update event: " + e.getMessage());
         }
     }
 }

@@ -209,6 +209,40 @@ public final class XMLEventRepository implements EventRepository {
 
     @Override
     public void updateEvent(User user, Event event) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        validateUsersUsername(user);
+        validateUserRepositoryLocation(user);
+
+        var document = getUserCalendarDocument(getUserFilePath(user.username()));
+        var eventsElement = document.getRootElement().getChild(XMLCalendarTags.EVENTS_TAG);
+
+        boolean eventFound = false;
+        for (var eventElement : eventsElement.getChildren()) {
+            if (eventElement.getChildText(XMLCalendarTags.ID_TAG).equals(String.valueOf(event.getId()))) {
+                eventFound = true;
+                if (event.getTitle() != null)
+                    eventElement.getChild(XMLCalendarTags.TITLE_TAG).setText(event.getTitle());
+                if (event.getDate() != null)
+                    eventElement.getChild(XMLCalendarTags.DATE_TAG).setText(event.getDate().toString());
+                if (event.getTime() != null)
+                    eventElement.getChild(XMLCalendarTags.TIME_TAG).setText(event.getTime().toString());
+                if (event.getLocation() != null)
+                    eventElement.getChild(XMLCalendarTags.LOCATION_TAG).setText(event.getLocation());
+                if (event.getDescription() != null)
+                    eventElement.getChild(XMLCalendarTags.DESCRIPTION_TAG).setText(event.getDescription());
+                break;
+            }
+        }
+
+        if (!eventFound) {
+            throw new XmlDatabaseException("Event with ID '" + event.getId() + "' not found in the calendar");
+        }
+
+        try {
+            XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+            outputter.output(document, Files.newOutputStream(getUserFilePath(user.username())));
+        } catch (IOException e) {
+            LOGGER.warn("Failed to modify calendar event", e);
+            throw new XmlDatabaseException("Failed to modify calendar event");
+        }
     }
 }

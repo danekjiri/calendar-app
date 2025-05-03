@@ -29,8 +29,8 @@ public final class AddEventCommand implements Command {
             throw new InsufficientCommandPrivilegesException("You must be logged in to add an event");
         }
 
-        String eventName = ui.promptForInput("Enter event name: ").trim();
-        if (eventName.isEmpty()) {
+        String title = ui.promptForInput("Enter event name: ").trim();
+        if (title.isEmpty()) {
             throw new InvalidInputException("Event name cannot be empty");
         }
 
@@ -59,7 +59,7 @@ public final class AddEventCommand implements Command {
         String location = ui.promptForInput("Enter event location (optional): ").trim();
         String description = ui.promptForInput("Enter event description (optional): ").trim();
 
-        var event = new Event(eventName, date, time, location, description);
+        var event = new Event(title, date, time, location, description);
         return new AddEventCommand(event);
     }
 

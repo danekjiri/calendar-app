@@ -39,6 +39,7 @@ public final class CLIUserInterface implements UserInterface {
         parser.registerCommand(HelpCommand.COMMAND_NAME, HelpCommand.class);
         parser.registerCommand(ShowEventsCommand.COMMAND_NAME, ShowEventsCommand.class);
         parser.registerCommand(DeleteEventCommand.COMMAND_NAME, DeleteEventCommand.class);
+        parser.registerCommand(UpdateEventCommand.COMMAND_NAME, UpdateEventCommand.class);
         // ... add more commands as needed
     }
 

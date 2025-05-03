@@ -3,10 +3,9 @@ package cz.cuni.mff.danekji1.calendar.core.commands;
 import cz.cuni.mff.danekji1.calendar.core.ui.ClientState;
 import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
 
-import java.io.IOException;
 import java.util.Map;
 
-public class HelpCommand implements Command {
+public final class HelpCommand implements Command {
     public static final String COMMAND_NAME = "help";
     private final Map<String, Class<? extends Command>> availableCommands;
 

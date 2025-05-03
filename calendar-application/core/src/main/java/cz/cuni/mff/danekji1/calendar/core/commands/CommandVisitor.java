@@ -11,5 +11,6 @@ public interface CommandVisitor<R, C> {
     R visit(HelpCommand command, C context);
     R visit(ShowEventsCommand command, C context);
     R visit(DeleteEventCommand command, C context);
+    R visit(UpdateEventCommand command, C context);
     // more to be added as needed...
 }
