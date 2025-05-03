@@ -17,11 +17,11 @@ import org.jdom2.output.XMLOutputter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class XMLEventRepository implements EventRepository {
     private final static Logger LOGGER = LogManager.getLogger(XMLEventRepository.class);
-    private final static Path XML_FILE_FOLDER = Path.of("./data");
 
     public XMLEventRepository() throws XmlDatabaseException {
         if (Files.notExists(XML_FILE_FOLDER)) {
@@ -33,9 +33,7 @@ public final class XMLEventRepository implements EventRepository {
         }
     }
 
-    private static Path getUserFilePath(String username) {
-        return Path.of(XML_FILE_FOLDER + "/" + username + ".xml");
-    }
+
 
     private Document buildNewCalendar(User user) {
         Element calendarElement = new Element(XMLCalendarTags.CALENDAR_TAG);
@@ -137,13 +135,8 @@ public final class XMLEventRepository implements EventRepository {
      */
     @Override
     public long addEvent(User user, Event event) throws XmlDatabaseException, IOException {
-        if (user.username() == null || user.username().isEmpty() || user.username().equals("unlogged")) {
-            throw new ServerException("Username cannot be null or empty or 'unlogged'");
-        }
-
-        if (!Files.exists(getUserFilePath(user.username()))) {
-            throw new XmlDatabaseException("The calendar for username '" + user.username() + "' does not exist");
-        }
+        validateUsersUsername(user);
+        validateUserRepositoryLocation(user);
 
         var document = getUserCalendarDocument(getUserFilePath(user.username()));
         var rootCalendar = document.getRootElement();
@@ -162,23 +155,34 @@ public final class XMLEventRepository implements EventRepository {
     }
 
     @Override
-    public void removeEvent(String username, Long eventId) {
-        throw new UnsupportedOperationException("Not implemented yet");
-
-    }
-
-    @Override
-    public List<Event> getAllEvents(String username) {
+    public void removeEvent(User user, Long eventId) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
-    public List<Event> getFutureEvents(String username) {
+    public List<Event> getAllEvents(User user) {
+        validateUsersUsername(user);
+        validateUserRepositoryLocation(user);
+
+        var document = getUserCalendarDocument(getUserFilePath(user.username()));
+        var eventsElement = document.getRootElement().getChild(XMLCalendarTags.EVENTS_TAG);
+
+        List<Event> events = new ArrayList<>();
+        for (var eventElement : eventsElement.getChildren()) {
+            var event = Event.fromXMLElement(eventElement);
+            events.add(event);
+        }
+
+        return events;
+    }
+
+    @Override
+    public List<Event> getFutureEvents(User user) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
-    public void updateEvent(String username, Event event) {
+    public void updateEvent(User user, Event event) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }

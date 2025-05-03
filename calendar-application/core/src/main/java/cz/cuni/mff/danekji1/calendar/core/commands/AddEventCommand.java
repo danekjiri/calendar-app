@@ -25,7 +25,7 @@ public final class AddEventCommand implements Command {
 
     @Override
     public Command buildCommand(UserInterface ui, ClientState context) throws IOException {
-        if (context.getCurrentUser() == null) {
+        if (!context.isLoggedIn()) {
             throw new InsufficientCommandPrivilegesException("You must be logged in to add an event");
         }
 

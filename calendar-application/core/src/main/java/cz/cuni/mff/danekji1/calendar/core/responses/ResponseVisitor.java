@@ -1,7 +1,7 @@
 package cz.cuni.mff.danekji1.calendar.core.responses;
 
 import cz.cuni.mff.danekji1.calendar.core.responses.error.ErrorResponse;
-import cz.cuni.mff.danekji1.calendar.core.responses.error.EventListResponse;
+import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessEventListResponse;
 import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessLoginResponse;
 import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessLogoutResponse;
 import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessResponse;
@@ -15,5 +15,5 @@ public interface ResponseVisitor<R, C> {
     R visit(SuccessLogoutResponse response, C context);
 
     R visit(ErrorResponse response, C context);
-    R visit(EventListResponse response, C context);
+    R visit(SuccessEventListResponse response, C context);
 }

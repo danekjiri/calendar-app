@@ -1,4 +1,4 @@
-package cz.cuni.mff.danekji1.calendar.core.responses.error;
+package cz.cuni.mff.danekji1.calendar.core.responses.success;
 
 import cz.cuni.mff.danekji1.calendar.core.models.Event;
 import cz.cuni.mff.danekji1.calendar.core.responses.Response;
@@ -6,15 +6,7 @@ import cz.cuni.mff.danekji1.calendar.core.responses.ResponseVisitor;
 
 import java.util.List;
 
-// might be record?
-public final class EventListResponse implements Response {
-    private final List<Event> events;
-
-    public EventListResponse(List<Event> events) {
-        this.events = events;
-    }
-
-    public List<Event> getEvents() { return events; }
+public record SuccessEventListResponse(List<Event> events) implements Response {
 
     /**
      * Helps to handle the command on the client side when displaying response.

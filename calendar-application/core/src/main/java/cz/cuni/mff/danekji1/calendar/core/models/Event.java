@@ -1,15 +1,21 @@
 package cz.cuni.mff.danekji1.calendar.core.models;
 
+import cz.cuni.mff.danekji1.calendar.core.exceptions.server.XmlDatabaseException;
 import cz.cuni.mff.danekji1.calendar.core.xml.XMLCalendarTags;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 public final class Event implements Serializable {
+    private final static Logger LOGGER = LogManager.getLogger(Event.class);
+
     private Long id;
     private String title;
     private LocalDate date;
@@ -58,6 +64,24 @@ public final class Event implements Serializable {
         return eventElement;
     }
 
+    public static Event fromXMLElement(Element eventElement) {
+        assert eventElement != null && eventElement.getName().equals(XMLCalendarTags.EVENT_TAG);
+
+        try {
+            Long id = Long.parseLong(eventElement.getChildText(XMLCalendarTags.ID_TAG));
+            String title = eventElement.getChildText(XMLCalendarTags.TITLE_TAG);
+            LocalDate date = LocalDate.parse(eventElement.getChildText(XMLCalendarTags.DATE_TAG));
+            LocalTime time = LocalTime.parse(eventElement.getChildText(XMLCalendarTags.TIME_TAG));
+            String location = eventElement.getChildText(XMLCalendarTags.LOCATION_TAG);
+            String description = eventElement.getChildText(XMLCalendarTags.DESCRIPTION_TAG);
+
+            return new Event(id, title, date, time, location, description);
+        } catch (NumberFormatException | DateTimeParseException e) {
+            LOGGER.error("Failed to parse event from XML: {}", e.getMessage());
+            throw new XmlDatabaseException("Failed to parse event from XML");
+        }
+    }
+
     public Long getId() {
         assert id != null;
         return id;
@@ -81,5 +105,11 @@ public final class Event implements Serializable {
 
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public String toString() {
+        return "Event { id=%d, title='%s', date='%s', time='%s', location='%s', description='%s'}"
+                .formatted(id, title, date, time, location, description);
     }
 }

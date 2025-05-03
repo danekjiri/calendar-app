@@ -3,6 +3,7 @@ package cz.cuni.mff.danekji1.calendar.server;
 import cz.cuni.mff.danekji1.calendar.core.commands.*;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.CalendarException;
 import cz.cuni.mff.danekji1.calendar.core.responses.error.ErrorResponse;
+import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessEventListResponse;
 import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessLoginResponse;
 import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessLogoutResponse;
 import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessResponse;
@@ -109,5 +110,15 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Sessio
             }
         }
         return new SuccessResponse(helpMessage.toString());
+    }
+
+    @Override
+    public Response visit(ShowEventsCommand command, Session context) {
+        if (!context.isLoggedIn()) {
+            return new ErrorResponse("You must be logged in to show events.");
+        }
+
+        var events = eventRepository.getAllEvents(context.getCurrentUser());
+        return new SuccessEventListResponse(events);
     }
 }

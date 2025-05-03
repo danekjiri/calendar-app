@@ -2,7 +2,7 @@ package cz.cuni.mff.danekji1.calendar.client.cli.ui;
 
 import cz.cuni.mff.danekji1.calendar.core.responses.*;
 import cz.cuni.mff.danekji1.calendar.core.responses.error.ErrorResponse;
-import cz.cuni.mff.danekji1.calendar.core.responses.error.EventListResponse;
+import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessEventListResponse;
 import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessLoginResponse;
 import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessLogoutResponse;
 import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessResponse;
@@ -35,12 +35,16 @@ public class DefaultCLIResponseDispatcher implements ResponseVisitor<Void, Clien
 
     @Override
     public Void visit(ErrorResponse response, ClientState session) {
-        LOGGER.error("Error: {}", response.getErrorMessage());
+        LOGGER.error("Error: {}", response.errorMessage());
         return null;
     }
 
     @Override
-    public Void visit(EventListResponse response, ClientState session) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Void visit(SuccessEventListResponse response, ClientState session) {
+        LOGGER.info("Successfully retrieved events:");
+        for (var event : response.events()) {
+            LOGGER.info("Event: {}", event);
+        }
+        return null;
     }
 }

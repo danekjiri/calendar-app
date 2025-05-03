@@ -50,7 +50,7 @@ public final class CLICommandParser {
         }
 
         try {
-            // todo: add annotation to class that should have default constructor
+            // todo: add annotation to class that it should have default constructor
             Constructor<? extends Command> constructor = commandClass.getDeclaredConstructor();
             constructor.setAccessible(true);
             Command tempCommand = constructor.newInstance();

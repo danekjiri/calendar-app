@@ -37,6 +37,7 @@ public final class CLIUserInterface implements UserInterface {
         parser.registerCommand(AddEventCommand.COMMAND_NAME, AddEventCommand.class);
         parser.registerCommand(LogoutCommand.COMMAND_NAME, LogoutCommand.class);
         parser.registerCommand(HelpCommand.COMMAND_NAME, HelpCommand.class);
+        parser.registerCommand(ShowEventsCommand.COMMAND_NAME, ShowEventsCommand.class);
     }
 
     @Override
@@ -55,31 +56,35 @@ public final class CLIUserInterface implements UserInterface {
            return;
         }
 
-        try {
-            displayHelpMessage(client);
+        displayHelpMessage(client);
 
-            LOGGER.debug("Starting user interface, waiting for commands...");
-            while(client.isConnectionOpen()) {
+        LOGGER.debug("Starting user interface, waiting for commands...");
+        while(client.isConnectionOpen()) {
+            try {
                 String prompt = formatUserPrompt(client.getCurrentSession());
                 String inputCommand = promptForInput(prompt).trim();
 
                 Command command = parser.parse(inputCommand, this, client.getCurrentSession());
                 Response response = client.sendCommand(command);
                 displayResponse(response, client.getCurrentSession());
+            } catch (IOException e) {
+                LOGGER.error("Failed to read command from user");
+            } catch (UnknownCommandException | InvalidInputException e) {
+                LOGGER.error(e.getMessage());
+            } catch (Exception e) {
+                LOGGER.error("An unexpected error occurred: {}", e.getMessage());
             }
-        } catch (IOException e) {
-            LOGGER.error("Failed to read command from user");
-        } catch (UnknownCommandException | InvalidInputException e) {
-            LOGGER.error(e.getMessage());
-        } catch (Exception e) {
-            LOGGER.error("An unexpected error occurred: {}", e.getMessage());
         }
     }
 
     private void displayHelpMessage(Client client) {
-        Command helpCommand = new HelpCommand(parser.getCommandRegistry());
-        Response helpResponse = client.sendCommand(helpCommand);
-        displayResponse(helpResponse, client.getCurrentSession());
+        try {
+            Command helpCommand = new HelpCommand(parser.getCommandRegistry());
+            Response helpResponse = client.sendCommand(helpCommand);
+            displayResponse(helpResponse, client.getCurrentSession());
+        } catch (Exception e) {
+            LOGGER.error("Failed to display help message");
+        }
     }
 
     /**
