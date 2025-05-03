@@ -24,7 +24,7 @@ public final class LogoutCommand implements Command {
      */
     @Override
     public String getDescription() {
-        return "logout: Logout from current logged account.";
+        return "Logout from current logged account.";
     }
 
     /**

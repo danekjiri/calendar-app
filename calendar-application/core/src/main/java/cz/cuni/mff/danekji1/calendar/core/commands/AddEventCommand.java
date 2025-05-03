@@ -73,7 +73,7 @@ public final class AddEventCommand implements Command {
      */
     @Override
     public String getDescription() {
-        return "add_event: Add a new event to the calendar for currently logged user.";
+        return "Add a new event to the calendar for currently logged user.";
     }
 
     /**

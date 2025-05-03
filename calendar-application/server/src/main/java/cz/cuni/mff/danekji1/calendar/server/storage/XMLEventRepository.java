@@ -155,8 +155,34 @@ public final class XMLEventRepository implements EventRepository {
     }
 
     @Override
-    public void removeEvent(User user, Long eventId) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public void deleteEvent(User user, Long eventId) {
+        validateUsersUsername(user);
+        validateUserRepositoryLocation(user);
+
+        var document = getUserCalendarDocument(getUserFilePath(user.username()));
+        var eventsElement = document.getRootElement().getChild(XMLCalendarTags.EVENTS_TAG);
+
+        boolean eventFound = false;
+        for (var eventElement : eventsElement.getChildren()) {
+            if (eventElement.getChildText(XMLCalendarTags.ID_TAG).equals(String.valueOf(eventId))) {
+                eventsElement.removeContent(eventElement);
+                eventFound = true;
+                break;
+            }
+        }
+
+        if (!eventFound) {
+            LOGGER.debug("Event with ID '{}' not found in the calendar for user '{}'", eventId, user.username());
+            throw new XmlDatabaseException("Event with ID '" + eventId + "' not found in the calendar");
+        }
+
+        try {
+            XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+            outputter.output(document, Files.newOutputStream(getUserFilePath(user.username())));
+        } catch (IOException e) {
+            LOGGER.debug("Failed to save calendar after deleting event", e);
+            throw new XmlDatabaseException("Failed to save calendar after deleting event");
+        }
     }
 
     @Override

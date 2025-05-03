@@ -2,6 +2,7 @@ package cz.cuni.mff.danekji1.calendar.server;
 
 import cz.cuni.mff.danekji1.calendar.core.commands.*;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.CalendarException;
+import cz.cuni.mff.danekji1.calendar.core.exceptions.server.XmlDatabaseException;
 import cz.cuni.mff.danekji1.calendar.core.responses.error.ErrorResponse;
 import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessEventListResponse;
 import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessLoginResponse;
@@ -9,9 +10,11 @@ import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessLogoutRespons
 import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessResponse;
 import cz.cuni.mff.danekji1.calendar.server.storage.EventRepository;
 import cz.cuni.mff.danekji1.calendar.core.responses.Response;
+import cz.cuni.mff.danekji1.calendar.server.storage.XMLEventRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 
@@ -118,7 +121,26 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Sessio
             return new ErrorResponse("You must be logged in to show events.");
         }
 
-        var events = eventRepository.getAllEvents(context.getCurrentUser());
-        return new SuccessEventListResponse(events);
+        try {
+            var events = eventRepository.getAllEvents(context.getCurrentUser());
+            return new SuccessEventListResponse(events);
+        } catch (XmlDatabaseException e) {
+            return new ErrorResponse("Failed to retrieve events: " + e.getMessage());
+        }
+
+    }
+
+    @Override
+    public Response visit(DeleteEventCommand command, Session context) {
+        if (!context.isLoggedIn()) {
+            return new ErrorResponse("You must be logged in to delete an event.");
+        }
+
+        try {
+            eventRepository.deleteEvent(context.getCurrentUser(), command.getEventId());
+            return new SuccessResponse("Event with id '" + command.getEventId() + "' deleted successfully.");
+        } catch (XmlDatabaseException e) {
+            return new ErrorResponse("Failed to delete event: " + e.getMessage());
+        }
     }
 }

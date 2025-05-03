@@ -44,7 +44,7 @@ public interface EventRepository {
      * @return the ID of the added event
      */
     long addEvent(User user, Event event) throws XmlDatabaseException, IOException;
-    void removeEvent(User user, Long eventId);
+    void deleteEvent(User user, Long eventId);
     List<Event> getAllEvents(User user);
     List<Event> getFutureEvents(User user);
     void updateEvent(User user, Event event);
