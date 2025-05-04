@@ -4,10 +4,8 @@ import cz.cuni.mff.danekji1.calendar.core.commands.*;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.CalendarException;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.server.XmlDatabaseException;
 import cz.cuni.mff.danekji1.calendar.core.responses.error.ErrorResponse;
-import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessEventListResponse;
-import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessLoginResponse;
-import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessLogoutResponse;
-import cz.cuni.mff.danekji1.calendar.core.responses.success.SuccessResponse;
+import cz.cuni.mff.danekji1.calendar.core.responses.success.*;
+import cz.cuni.mff.danekji1.calendar.core.session.Session;
 import cz.cuni.mff.danekji1.calendar.server.storage.EventRepository;
 import cz.cuni.mff.danekji1.calendar.core.responses.Response;
 import org.apache.logging.log4j.LogManager;
@@ -154,5 +152,11 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Sessio
         } catch (XmlDatabaseException e) {
             return new ErrorResponse("Failed to update event: " + e.getMessage());
         }
+    }
+
+    @Override
+    public Response visit(QuitCommand command, Session context) {
+        context.deactivate();
+        return new SuccessQuit();
     }
 }

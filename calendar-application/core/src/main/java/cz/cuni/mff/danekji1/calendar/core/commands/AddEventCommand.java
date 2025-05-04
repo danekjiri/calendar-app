@@ -3,7 +3,7 @@ package cz.cuni.mff.danekji1.calendar.core.commands;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InsufficientCommandPrivilegesException;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InvalidInputException;
 import cz.cuni.mff.danekji1.calendar.core.models.Event;
-import cz.cuni.mff.danekji1.calendar.core.ui.ClientState;
+import cz.cuni.mff.danekji1.calendar.core.session.Session;
 import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
 
 import java.io.IOException;
@@ -24,7 +24,7 @@ public final class AddEventCommand implements Command {
     }
 
     @Override
-    public Command buildCommand(UserInterface ui, ClientState context) throws IOException {
+    public Command buildCommand(UserInterface ui, Session context) throws IOException {
         if (!context.isLoggedIn()) {
             throw new InsufficientCommandPrivilegesException("You must be logged in to add an event");
         }

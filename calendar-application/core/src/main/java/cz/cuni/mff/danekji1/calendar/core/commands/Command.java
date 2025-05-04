@@ -2,7 +2,7 @@ package cz.cuni.mff.danekji1.calendar.core.commands;
 
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InvalidInputException;
 import cz.cuni.mff.danekji1.calendar.core.models.User;
-import cz.cuni.mff.danekji1.calendar.core.ui.ClientState;
+import cz.cuni.mff.danekji1.calendar.core.session.Session;
 import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.io.Serializable;
  */
 public interface Command extends Serializable {
 
-    public abstract Command buildCommand(UserInterface ui, ClientState context) throws IOException;
+    public abstract Command buildCommand(UserInterface ui, Session context) throws IOException;
 
     public abstract String getName();
 

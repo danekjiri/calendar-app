@@ -1,0 +1,14 @@
+package cz.cuni.mff.danekji1.calendar.core.responses.success;
+
+import cz.cuni.mff.danekji1.calendar.core.responses.Response;
+import cz.cuni.mff.danekji1.calendar.core.responses.ResponseVisitor;
+
+import java.io.IOException;
+
+public class SuccessQuit implements Response {
+
+    @Override
+    public <R, C> R accept(ResponseVisitor<R, C> visitor, C context) throws IOException {
+        return visitor.visit(this, context);
+    }
+}

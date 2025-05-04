@@ -2,7 +2,7 @@ package cz.cuni.mff.danekji1.calendar.client.cli.ui;
 
 import cz.cuni.mff.danekji1.calendar.core.Client;
 import cz.cuni.mff.danekji1.calendar.core.commands.*;
-import cz.cuni.mff.danekji1.calendar.core.ui.ClientState;
+import cz.cuni.mff.danekji1.calendar.core.session.Session;
 import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InvalidInputException;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.UnknownCommandException;
@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.net.SocketException;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -22,7 +23,7 @@ public final class CLIUserInterface implements UserInterface {
 
     private final Scanner userInput;
     private final OutputStreamWriter userOutput;
-    private final ResponseVisitor<Void, ClientState> responseDispatcher;
+    private final ResponseVisitor<Void, Session> responseDispatcher;
     private final CLICommandParser parser;
 
     public CLIUserInterface(InputStream userInput, OutputStream userOutput) {
@@ -40,6 +41,7 @@ public final class CLIUserInterface implements UserInterface {
         parser.registerCommand(ShowEventsCommand.COMMAND_NAME, ShowEventsCommand.class);
         parser.registerCommand(DeleteEventCommand.COMMAND_NAME, DeleteEventCommand.class);
         parser.registerCommand(UpdateEventCommand.COMMAND_NAME, UpdateEventCommand.class);
+        parser.registerCommand(QuitCommand.COMMAND_NAME, QuitCommand.class);
         // ... add more commands as needed
     }
 
@@ -62,7 +64,7 @@ public final class CLIUserInterface implements UserInterface {
         displayHelpMessage(client);
 
         LOGGER.debug("Starting user interface, waiting for commands...");
-        while(client.isConnectionOpen()) {
+        while(client.isConnectionOpen() && client.getCurrentSession().isActive()) {
             try {
                 String prompt = formatUserPrompt(client.getCurrentSession());
                 String inputCommand = promptForInput(prompt).trim();
@@ -70,10 +72,13 @@ public final class CLIUserInterface implements UserInterface {
                 Command command = parser.parse(inputCommand, this, client.getCurrentSession());
                 Response response = client.sendCommand(command);
                 displayResponse(response, client.getCurrentSession());
-            } catch (IOException e) {
-                LOGGER.error("Failed to read command from user or display response: {}", e.getMessage());
+            } catch (SocketException e) {
+                LOGGER.fatal("Failed to send command to the server, try reconnection to the server");
+                break;
             } catch (UnknownCommandException | InvalidInputException e) {
                 LOGGER.error(e.getMessage());
+            } catch(IOException e) {
+                LOGGER.error("Failed to read command from user or display response: {}", e.getMessage());
             } catch (Exception e) {
                 LOGGER.error("An unexpected error occurred: {}", e.getMessage());
             }
@@ -94,7 +99,7 @@ public final class CLIUserInterface implements UserInterface {
      * Formats the prompt for the user.
      * The prompt includes the username and a fixed string.
      */
-    private String formatUserPrompt(ClientState session) {
+    private String formatUserPrompt(Session session) {
         return String.format("\n$%s@calendar> ", session.getCurrentUser() != null
                 ? session.getCurrentUser().username() : "unlogged");
     }
@@ -104,7 +109,7 @@ public final class CLIUserInterface implements UserInterface {
      * This method uses the Visitor pattern to handle different types of responses.
      */
     @Override
-    public void displayResponse(Response response, ClientState session) throws IOException {
+    public void displayResponse(Response response, Session session) throws IOException {
         response.accept(responseDispatcher, session);
     }
 

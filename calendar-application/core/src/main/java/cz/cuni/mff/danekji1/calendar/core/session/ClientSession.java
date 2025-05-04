@@ -1,14 +1,15 @@
-package cz.cuni.mff.danekji1.calendar.client.cli;
+package cz.cuni.mff.danekji1.calendar.core.session;
 
 import cz.cuni.mff.danekji1.calendar.core.models.User;
-import cz.cuni.mff.danekji1.calendar.core.ui.ClientState;
 
-public class ClientSession implements ClientState {
+public class ClientSession implements Session {
     private User user;
     private final int sessionId;
+    private boolean isActive;
 
     public ClientSession(int sessionId) {
         this.sessionId = sessionId;
+        this.isActive = true;
     }
 
     @Override
@@ -35,5 +36,15 @@ public class ClientSession implements ClientState {
     @Override
     public void unsetCurrentUser() {
         this.user = null;
+    }
+
+    @Override
+    public boolean isActive() {
+        return isActive;
+    }
+
+    @Override
+    public void deactivate() {
+        this.isActive = false;
     }
 }

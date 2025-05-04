@@ -1,14 +1,14 @@
 package cz.cuni.mff.danekji1.calendar.core.commands;
 
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InsufficientCommandPrivilegesException;
-import cz.cuni.mff.danekji1.calendar.core.ui.ClientState;
+import cz.cuni.mff.danekji1.calendar.core.session.Session;
 import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
 
 public final class LogoutCommand implements Command {
     public static final String COMMAND_NAME = "logout";
 
     @Override
-    public Command buildCommand(UserInterface ui, ClientState context) {
+    public Command buildCommand(UserInterface ui, Session context) {
         if (!context.isLoggedIn()) {
             throw new InsufficientCommandPrivilegesException("You must be logged to logout");
         }

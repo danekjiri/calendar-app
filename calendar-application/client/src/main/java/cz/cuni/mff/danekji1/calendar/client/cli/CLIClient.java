@@ -1,8 +1,8 @@
 package cz.cuni.mff.danekji1.calendar.client.cli;
 
 import cz.cuni.mff.danekji1.calendar.client.cli.ui.CLIUserInterface;
+import cz.cuni.mff.danekji1.calendar.core.session.ClientSession;
 import cz.cuni.mff.danekji1.calendar.core.commands.Command;
-import cz.cuni.mff.danekji1.calendar.core.responses.error.ErrorResponse;
 import cz.cuni.mff.danekji1.calendar.core.responses.Response;
 import cz.cuni.mff.danekji1.calendar.core.Client;
 
@@ -11,7 +11,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import cz.cuni.mff.danekji1.calendar.core.ui.ClientState;
+import cz.cuni.mff.danekji1.calendar.core.session.Session;
 import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,19 +32,18 @@ public final class CLIClient implements Client {
         return socket != null &&  socket.isConnected() && !socket.isClosed();
     }
 
+    @Override
+    public void disconnect() {
+    }
+
     public CLIClient(UserInterface ui) {
         this.ui = ui;
     }
 
     @Override
-    public ClientState getCurrentSession() {
+    public Session getCurrentSession() {
         assert session != null;
         return session;
-    }
-
-    @Override
-    public void disconnect() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
@@ -68,18 +67,13 @@ public final class CLIClient implements Client {
     /**
      * Sends a command to the server and receives the response.
      */
-    public Response sendCommand(Command command) {
+    public Response sendCommand(Command command) throws ClassNotFoundException, IOException {
         LOGGER.debug("Sending command '{}'", command);
 
-        try {
-            out.writeObject(command);
-            out.flush();
+        out.writeObject(command);
+        out.flush();
 
-            return (Response) in.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            LOGGER.fatal("Failed to send command", e);
-            return new ErrorResponse("Failed to send command");
-        }
+        return (Response) in.readObject();
     }
 
     public void start() {
