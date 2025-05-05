@@ -14,6 +14,11 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 
+/**
+ * Default implementation of the {@link CommandVisitor} interface.
+ * This class is responsible for dispatching commands to their respective handlers.
+ * It implements the {@link CommandVisitor} interface to handle different command types.
+ */
 public class DefaultCommandDispatcher implements CommandVisitor<Response, ClientSession> {
     private static final Logger LOGGER = LogManager.getLogger(DefaultCommandDispatcher.class);
     private final EventRepository eventRepository;
@@ -224,6 +229,14 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Client
         }
     }
 
+    /**
+     * The implementation of the CommandVisitor endpoint for QuitCommand.
+     * Terminates the client session and returns a successful response.
+     *
+     * @param command The {@link QuitCommand} command
+     * @param session The client session
+     * @return The {@link SuccessQuit} response
+     */
     @Override
     public Response visit(QuitCommand command, ClientSession session) {
         session.terminate();

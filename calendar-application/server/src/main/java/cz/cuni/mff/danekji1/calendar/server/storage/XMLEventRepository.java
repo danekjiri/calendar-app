@@ -20,9 +20,21 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * XMLEventRepository is a class that implements the EventRepository interface.
+ * It provides methods for managing user calendars stored in XML files.
+ * The class handles creating, reading, updating, and deleting events in the XML files.
+ */
 public final class XMLEventRepository implements EventRepository {
     private final static Logger LOGGER = LogManager.getLogger(XMLEventRepository.class);
+    public static final Path XML_FILE_FOLDER = Path.of("./data");
 
+    /**
+     * Constructor for XMLEventRepository.
+     * Creates the XML file folder if it does not exist.
+     *
+     * @throws XmlDatabaseException if an error occurs while creating the folder
+     */
     public XMLEventRepository() throws XmlDatabaseException {
         if (Files.notExists(XML_FILE_FOLDER)) {
             try {
@@ -36,7 +48,31 @@ public final class XMLEventRepository implements EventRepository {
     }
 
     /**
+     * Returns the path to the XML file for the given username.
+     *
+     * @param username the username for which to get the file path
+     * @return the path to the XML file
+     */
+    public Path getUserFilePath(String username) {
+        return Path.of(XML_FILE_FOLDER + "/" + username + ".xml");
+    }
+
+    /**
+     * Validates a user's calendar file path if it exists.
+     *
+     * @param user The user which calendar file will be validated
+     * @throws XmlDatabaseException if the file does not exist
+     */
+    public void validateUserRepositoryLocation(User user) throws XmlDatabaseException {
+        if (!Files.exists(getUserFilePath(user.username()))) {
+            LOGGER.error("User calendar file for username '{}' does not exist", user.username());
+            throw new XmlDatabaseException("The calendar for username '" + user.username() + "' does not exist");
+        }
+    }
+
+    /**
      * Creates XML Document containing template for a new calendar.
+     *
      * @param user User for which the calendar will be created
      * @return XML Document containing template for a new calendar
      */
@@ -83,6 +119,7 @@ public final class XMLEventRepository implements EventRepository {
 
     /**
      * Parses a user's calendar XML file and returns the Document object.
+     *
      * @param file The path to the user's calendar XML file
      * @return the Document object representing the user's calendar
      * @throws XmlDatabaseException if an error occurs while parsing the XML file or if the file is not valid calendar
@@ -137,6 +174,7 @@ public final class XMLEventRepository implements EventRepository {
      * @param user The user for which the event will be added.
      * @param event The event to add.
      * @return The ID of the added event.
+     * @throws XmlDatabaseException if an error occurs while adding the event
      */
     @Override
     public long addEvent(User user, Event event, ClientSession session) throws XmlDatabaseException, IOException {
