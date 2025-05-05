@@ -1,5 +1,9 @@
 package cz.cuni.mff.danekji1.calendar.core.xml;
 
+/**
+ * This class contains constants for XML tags used in the calendar application.
+ * The tags are used to represent various elements in the XML structure of the calendar data.
+ */
 public final class XMLCalendarTags {
     public static final String CALENDAR_TAG = "calendar";
     public static final String USER_TAG = "user";

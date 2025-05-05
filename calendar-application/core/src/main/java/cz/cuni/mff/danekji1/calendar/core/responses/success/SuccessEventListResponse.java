@@ -10,10 +10,10 @@ import java.util.List;
 public record SuccessEventListResponse(List<Event> events) implements Response {
 
     /**
-     * Helps to handle the command on the client side when displaying response.
+     * {@inheritDoc}
      */
     @Override
-    public <R, C> R accept(ResponseVisitor<R, C> visitor, C session) throws IOException {
+    public <R, S> R accept(ResponseVisitor<R, S> visitor, S session) throws IOException {
         return visitor.visit(this, session);
     }
 }

@@ -7,8 +7,11 @@ import java.io.IOException;
 
 public class SuccessQuit implements Response {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public <R, C> R accept(ResponseVisitor<R, C> visitor, C session) throws IOException {
+    public <R, S> R accept(ResponseVisitor<R, S> visitor, S session) throws IOException {
         return visitor.visit(this, session);
     }
 }

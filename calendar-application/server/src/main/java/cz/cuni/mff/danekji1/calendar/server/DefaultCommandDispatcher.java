@@ -63,7 +63,7 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Client
     public Response visit(CreateAccountCommand command, ClientSession session) {
         try {
             eventRepository.createAccount(command.getUser(), session);
-        } catch (CalendarException | XmlDatabaseException e) {
+        } catch (CalendarException e) {
             return new ErrorResponse(e.getMessage());
         }
 

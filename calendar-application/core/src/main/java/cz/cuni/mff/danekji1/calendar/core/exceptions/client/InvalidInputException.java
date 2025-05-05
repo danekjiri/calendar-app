@@ -1,6 +1,6 @@
 package cz.cuni.mff.danekji1.calendar.core.exceptions.client;
 
-/*
+/**
  * Exception thrown when an invalid input is provided by the user.
  * <p>
  * This exception is a subclass of {@link ClientException} and is used to indicate

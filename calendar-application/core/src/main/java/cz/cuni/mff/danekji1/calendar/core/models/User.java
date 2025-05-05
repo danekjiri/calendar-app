@@ -12,6 +12,11 @@ import java.util.List;
  */
 public record User(String username, int passwordHash) implements Serializable {
 
+    /**
+     * Coverts the User object to an XML element.
+     *
+     * @return The XML element representing the user.
+     */
     public Element toXMLElement() {
         Element userElement = new Element(XMLCalendarTags.USER_TAG);
 
