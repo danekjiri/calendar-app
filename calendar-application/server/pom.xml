@@ -4,13 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>cz.cuni.mff.danekji1</groupId>
+        <groupId>cz.cuni.mff.danekji</groupId>
         <artifactId>calendar-application</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>server</artifactId>
     <packaging>jar</packaging>
+    <description>
+        The server module manages client connections, processes commands, and handles data persistence.
+        It includes the server implementation and storage mechanisms for the calendar application.
+    </description>
 
     <dependencies>
         <dependency>
@@ -23,7 +27,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>cz.cuni.mff.danekji1</groupId>
+            <groupId>cz.cuni.mff.danekji</groupId>
             <artifactId>core</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -36,7 +40,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
-                    <mainClass>cz.cuni.mff.danekji1.calendar.server.Server</mainClass>
+                    <mainClass>cz.cuni.mff.danekji.calendar.server.Server</mainClass>
                     <workingDirectory>${project.basedir}</workingDirectory>
                 </configuration>
             </plugin>

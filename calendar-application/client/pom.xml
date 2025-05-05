@@ -4,17 +4,21 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>cz.cuni.mff.danekji1</groupId>
+        <groupId>cz.cuni.mff.danekji</groupId>
         <artifactId>calendar-application</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>client</artifactId>
     <packaging>jar</packaging>
+    <description>
+        The client module provides the command-line interface for interacting with the calendar server.
+        It handles user input, command parsing, and communication with the server.
+    </description>
 
     <dependencies>
         <dependency>
-            <groupId>cz.cuni.mff.danekji1</groupId>
+            <groupId>cz.cuni.mff.danekji</groupId>
             <artifactId>core</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -27,12 +31,13 @@
 
     <build>
         <plugins>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
-                    <mainClass>cz.cuni.mff.danekji1.calendar.client.cli.CLIClient</mainClass>
+                    <mainClass>cz.cuni.mff.danekji.calendar.client.cli.CLIClient</mainClass>
                 </configuration>
             </plugin>
         </plugins>

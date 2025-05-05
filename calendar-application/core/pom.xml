@@ -4,13 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>cz.cuni.mff.danekji1</groupId>
+        <groupId>cz.cuni.mff.danekji</groupId>
         <artifactId>calendar-application</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>core</artifactId>
     <packaging>jar</packaging>
+    <description>
+        The core module contains shared components and utilities for the calendar application.
+        It includes models, commands, responses, and exceptions used across the client and server.
+    </description>
 
     <dependencies>
         <dependency>
