@@ -2,7 +2,7 @@ package cz.cuni.mff.danekji1.calendar.core.commands;
 
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InsufficientCommandPrivilegesException;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InvalidInputException;
-import cz.cuni.mff.danekji1.calendar.core.session.Session;
+import cz.cuni.mff.danekji1.calendar.core.session.ClientSession;
 import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
 
 import java.io.IOException;
@@ -20,8 +20,8 @@ public final class DeleteEventCommand implements Command {
     }
 
     @Override
-    public Command buildCommand(UserInterface ui, Session context) throws IOException {
-        if (!context.isLoggedIn()) {
+    public Command buildCommand(UserInterface ui, ClientSession session) throws IOException {
+        if (!session.isLoggedIn()) {
             throw new InsufficientCommandPrivilegesException("You must be logged in to delete an event");
         }
 
@@ -51,8 +51,8 @@ public final class DeleteEventCommand implements Command {
     }
 
     @Override
-    public <R, C> R accept(CommandVisitor<R, C> visitor, C context) {
-        return visitor.visit(this, context);
+    public <R, C> R accept(CommandVisitor<R, C> visitor, C session) {
+        return visitor.visit(this, session);
     }
 
     public Long getEventId() {

@@ -8,5 +8,5 @@ import java.io.Serializable;
  * Also supports the Visitor pattern.
  */
 public interface Response extends Serializable {
-    <R, C> R accept(ResponseVisitor<R, C> visitor, C context) throws IOException;
+    <R, C> R accept(ResponseVisitor<R, C> visitor, C session) throws IOException;
 }

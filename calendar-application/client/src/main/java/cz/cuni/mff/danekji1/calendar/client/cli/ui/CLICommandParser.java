@@ -4,7 +4,7 @@ import cz.cuni.mff.danekji1.calendar.core.commands.*;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InvalidInputException;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.UnknownCommandException;
 
-import cz.cuni.mff.danekji1.calendar.core.session.Session;
+import cz.cuni.mff.danekji1.calendar.core.session.ClientSession;
 import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,7 +41,7 @@ public final class CLICommandParser {
     }
 
 
-    public Command parse(String input, UserInterface ui, Session context) throws IOException, InvalidInputException, UnknownCommandException {
+    public Command parse(String input, UserInterface ui, ClientSession context) throws IOException, InvalidInputException, UnknownCommandException {
         String commandName = input.toLowerCase().trim();
 
         var commandClass = commandRegistry.get(commandName);

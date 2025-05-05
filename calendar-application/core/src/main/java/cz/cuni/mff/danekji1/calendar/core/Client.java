@@ -2,7 +2,7 @@ package cz.cuni.mff.danekji1.calendar.core;
 
 import cz.cuni.mff.danekji1.calendar.core.commands.Command;
 import cz.cuni.mff.danekji1.calendar.core.responses.Response;
-import cz.cuni.mff.danekji1.calendar.core.session.Session;
+import cz.cuni.mff.danekji1.calendar.core.session.ClientSession;
 
 import java.io.IOException;
 
@@ -11,6 +11,6 @@ public interface Client {
     void start();
     void disconnect();
     boolean isConnectionOpen();
-    Session getCurrentSession();
+    ClientSession getCurrentSession();
     Response sendCommand(Command command) throws ClassNotFoundException, IOException;
 }

@@ -2,49 +2,50 @@ package cz.cuni.mff.danekji1.calendar.core.session;
 
 import cz.cuni.mff.danekji1.calendar.core.models.User;
 
-public class ClientSession implements Session {
-    private User user;
+import java.net.SocketAddress;
+
+public final class ClientSession  {
+    private final SocketAddress clientAddress;
     private final int sessionId;
+    private User user;
     private boolean isActive;
 
-    public ClientSession(int sessionId) {
+    public ClientSession(int sessionId, SocketAddress socketAddress) {
         this.sessionId = sessionId;
+        this.clientAddress = socketAddress;
         this.isActive = true;
     }
 
-    @Override
+    public SocketAddress getClientAddress() {
+        return clientAddress;
+    }
+
     public int getSessionId() {
         return sessionId;
     }
 
-    @Override
     public boolean isLoggedIn() {
         return user != null;
     }
 
-    @Override
     public User getCurrentUser() {
         return user;
     }
 
-    @Override
     public void setCurrentUser(User user) {
         assert user != null;
         this.user = user;
     }
 
-    @Override
     public void unsetCurrentUser() {
         this.user = null;
     }
 
-    @Override
     public boolean isActive() {
         return isActive;
     }
 
-    @Override
-    public void deactivate() {
+    public void terminate() {
         this.isActive = false;
     }
 }

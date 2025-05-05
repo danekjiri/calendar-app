@@ -1,6 +1,6 @@
 package cz.cuni.mff.danekji1.calendar.core.commands;
 
-import cz.cuni.mff.danekji1.calendar.core.session.Session;
+import cz.cuni.mff.danekji1.calendar.core.session.ClientSession;
 import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
 
 import java.io.IOException;
@@ -9,7 +9,7 @@ public final class QuitCommand implements Command {
     public static final String COMMAND_NAME = "quit";
 
     @Override
-    public Command buildCommand(UserInterface ui, Session context) throws IOException {
+    public Command buildCommand(UserInterface ui, ClientSession session) throws IOException {
         return new QuitCommand();
     }
 
@@ -29,7 +29,7 @@ public final class QuitCommand implements Command {
     }
 
     @Override
-    public <R, C> R accept(CommandVisitor<R, C> visitor, C context) {
-        return visitor.visit(this, context);
+    public <R, C> R accept(CommandVisitor<R, C> visitor, C session) {
+        return visitor.visit(this, session);
     }
 }

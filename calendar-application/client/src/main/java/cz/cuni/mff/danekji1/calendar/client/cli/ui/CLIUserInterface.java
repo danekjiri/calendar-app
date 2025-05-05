@@ -2,7 +2,7 @@ package cz.cuni.mff.danekji1.calendar.client.cli.ui;
 
 import cz.cuni.mff.danekji1.calendar.core.Client;
 import cz.cuni.mff.danekji1.calendar.core.commands.*;
-import cz.cuni.mff.danekji1.calendar.core.session.Session;
+import cz.cuni.mff.danekji1.calendar.core.session.ClientSession;
 import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InvalidInputException;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.UnknownCommandException;
@@ -23,7 +23,7 @@ public final class CLIUserInterface implements UserInterface {
 
     private final Scanner userInput;
     private final OutputStreamWriter userOutput;
-    private final ResponseVisitor<Void, Session> responseDispatcher;
+    private final ResponseVisitor<Void, ClientSession> responseDispatcher;
     private final CLICommandParser parser;
 
     public CLIUserInterface(InputStream userInput, OutputStream userOutput) {
@@ -99,7 +99,7 @@ public final class CLIUserInterface implements UserInterface {
      * Formats the prompt for the user.
      * The prompt includes the username and a fixed string.
      */
-    private String formatUserPrompt(Session session) {
+    private String formatUserPrompt(ClientSession session) {
         return String.format("\n$%s@calendar> ", session.getCurrentUser() != null
                 ? session.getCurrentUser().username() : "unlogged");
     }
@@ -109,7 +109,7 @@ public final class CLIUserInterface implements UserInterface {
      * This method uses the Visitor pattern to handle different types of responses.
      */
     @Override
-    public void displayResponse(Response response, Session session) throws IOException {
+    public void displayResponse(Response response, ClientSession session) throws IOException {
         response.accept(responseDispatcher, session);
     }
 

@@ -16,9 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import cz.cuni.mff.danekji1.calendar.core.commands.CommandVisitor;
-import cz.cuni.mff.danekji1.calendar.core.responses.error.ErrorResponse;
 import cz.cuni.mff.danekji1.calendar.core.session.ClientSession;
-import cz.cuni.mff.danekji1.calendar.core.session.Session;
 import cz.cuni.mff.danekji1.calendar.server.storage.XMLEventRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,13 +31,14 @@ import cz.cuni.mff.danekji1.calendar.core.responses.Response;
 public class Server {
     private static final Logger LOGGER = LogManager.getLogger(Server.class.getName());
 
+    private static final int SESSION_TIMEOUT = 3 * 60 * 1000; // 3 minutes
     private static final Random RANDOM = new Random(42);
-    private final Map<Integer, Session> sessions = Collections.synchronizedMap(new HashMap<>());
-    private final CommandVisitor<Response, Session> commandDispatcher;
+    private final Map<Integer, ClientSession> sessions = Collections.synchronizedMap(new HashMap<>());
+    private final CommandVisitor<Response, ClientSession> commandDispatcher;
 
     public Server(EventRepository eventRepository) {
         this.commandDispatcher = new DefaultCommandDispatcher(eventRepository);
-        LOGGER.info("Server initialized.");
+        LOGGER.info("Server initialized with event repository: {}", eventRepository.getClass().getSimpleName());
     }
 
     /**
@@ -66,13 +65,14 @@ public class Server {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 int sessionId = getUniqueSessionId();
-                var prev = sessions.put(sessionId, new ClientSession(sessionId));
-                assert prev == null;
+                var newSession = new ClientSession(sessionId, clientSocket.getRemoteSocketAddress());
+                var retrievedSession = sessions.put(sessionId, newSession);
+                assert retrievedSession == null;
 
-                executor.submit(() -> handleClient(clientSocket, sessionId));
+                executor.submit(() -> handleClient(clientSocket, newSession));
             }
         } catch (Exception e) {
-            LOGGER.fatal("Failed to start server on port '{}', because of '{}'", port, e);
+            LOGGER.fatal("Failed to start server on port '{}'", port, e);
         }
     }
 
@@ -80,29 +80,29 @@ public class Server {
      * Handles client connections in a separate thread.
      * Sets up the connection, processes commands, and ensures proper cleanup.
      */
-    private void handleClient(Socket clientSocket, int sessionId) {
+    private void handleClient(Socket clientSocket, ClientSession session) {
         try {
             configureSocket(clientSocket);
         } catch (SocketException e) {
-            LOGGER.error("Failed to configure socket for session {}: {}", sessionId, e.getMessage());
-            sessions.remove(sessionId);
+            LOGGER.error("Client session '{}' encountered a socket error.", session.getSessionId(), e);
+            sessions.remove(session.getSessionId());
             return;
         }
 
         try (ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
              ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream())) {
-            sendSessionId(out, clientSocket, sessionId);
-            runSessionLoop(in, out, sessionId);
+            sendSessionId(out, session);
+            runSessionLoop(in, out, session);
         } catch (IOException e) {
-            LOGGER.error("IO error in client handler for session {}: {}", sessionId, e.getMessage());
+            LOGGER.error("Client session '{}' encountered an IO error.", session.getSessionId(), e);
         } finally {
-            sessions.remove(sessionId);
+            sessions.remove(session.getSessionId());
             try {
                 clientSocket.close();
             } catch (IOException e) {
-                LOGGER.error("Error closing client socket for session {}: {}", sessionId, e.getMessage());
+                LOGGER.error("Client session '{}' failed to close socket.", session.getSessionId(), e);
             }
-            LOGGER.info("Session {} terminated and removed from sessions map.", sessionId);
+            LOGGER.info("Client session '{}': Terminated and removed from sessions map.", session.getSessionId());
         }
     }
 
@@ -110,40 +110,38 @@ public class Server {
      * Configures the client socket with a timeout.
      */
     private void configureSocket(Socket clientSocket) throws SocketException {
-        clientSocket.setSoTimeout(3 * 60 * 1000); // 3 minutes
+        clientSocket.setSoTimeout(SESSION_TIMEOUT);
     }
 
     /**
      * Sends the session ID to the client and logs the connection.
      */
-    private void sendSessionId(ObjectOutputStream out, Socket clientSocket, int sessionId) throws IOException {
-        out.writeObject(sessionId);
+    private void sendSessionId(ObjectOutputStream out, ClientSession session) throws IOException {
+        out.writeObject(session.getSessionId());
         out.flush();
-        LOGGER.info("Client connected: '{}' with sessionId '{}'", clientSocket.getRemoteSocketAddress(), sessionId);
+        LOGGER.info("Client address '{}' connected with sessionId '{}'", session.getClientAddress(), session.getSessionId());
     }
 
     /**
      * Runs the loop to process commands while the session is valid.
      */
-    private void runSessionLoop(ObjectInputStream in, ObjectOutputStream out, int sessionId) {
-        while (isSessionValid(sessionId)) {
-            Session session = sessions.get(sessionId);
+    private void runSessionLoop(ObjectInputStream in, ObjectOutputStream out, ClientSession session) throws IOException {
+        while (isSessionValid(session.getSessionId())) {
             try {
                 Command command = (Command) in.readObject();
-                LOGGER.debug("Received command: {}", command);
+                LOGGER.info("Client session '{}' received command '{}'", session.getSessionId(), command);
 
                 Response response = command.accept(commandDispatcher, session);
                 out.writeObject(response);
                 out.flush();
-                LOGGER.debug("Sent response: {}", response);
             } catch (SocketTimeoutException e) {
-                LOGGER.info("Session {} timed out after inactivity.", session.getSessionId());
+                LOGGER.info("Session '{}' timed out after '{} seconds' inactivity. Closing connection...", session.getSessionId(), SESSION_TIMEOUT/1000);
                 return;
             } catch (EOFException e) {
-                LOGGER.info("Client disconnected for session {}.", session.getSessionId());
+                LOGGER.info("Client session '{}' closed the connection.", session.getSessionId());
                 return;
             } catch (Exception e) {
-                LOGGER.error("Error handling client for session {}: {}", session.getSessionId(), e.getMessage());
+                LOGGER.error("Client session '{}' encountered an unexpected error.", session.getSessionId(), e);
                 return;
             }
         }
@@ -153,7 +151,7 @@ public class Server {
      * Checks if the session is still valid (present in the map and active).
      */
     private boolean isSessionValid(int sessionId) {
-        Session session = sessions.get(sessionId);
+        ClientSession session = sessions.get(sessionId);
         return session != null && session.isActive();
     }
 

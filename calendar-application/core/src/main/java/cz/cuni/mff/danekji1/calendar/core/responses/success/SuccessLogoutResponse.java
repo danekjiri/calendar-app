@@ -8,7 +8,7 @@ import java.io.IOException;
 public record SuccessLogoutResponse(String message) implements Response {
 
     @Override
-    public <R, C> R accept(ResponseVisitor<R, C> visitor, C context) throws IOException {
-        return visitor.visit(this, context);
+    public <R, C> R accept(ResponseVisitor<R, C> visitor, C session) throws IOException {
+        return visitor.visit(this, session);
     }
 }

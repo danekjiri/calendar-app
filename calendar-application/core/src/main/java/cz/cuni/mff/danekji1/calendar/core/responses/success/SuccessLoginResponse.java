@@ -12,7 +12,7 @@ public record SuccessLoginResponse(String message, User user) implements Respons
      * Helps to handle the command on the client side when displaying response.
      */
     @Override
-    public <R, C> R accept(ResponseVisitor<R, C> visitor, C context) throws IOException {
-        return visitor.visit(this, context);
+    public <R, C> R accept(ResponseVisitor<R, C> visitor, C session) throws IOException {
+        return visitor.visit(this, session);
     }
 }

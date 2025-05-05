@@ -2,7 +2,7 @@ package cz.cuni.mff.danekji1.calendar.core.commands;
 
 
 import cz.cuni.mff.danekji1.calendar.core.models.User;
-import cz.cuni.mff.danekji1.calendar.core.session.Session;
+import cz.cuni.mff.danekji1.calendar.core.session.ClientSession;
 import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ public final class CreateAccountCommand implements Command {
     }
 
     @Override
-    public Command buildCommand(UserInterface ui, Session context) throws IOException {
+    public Command buildCommand(UserInterface ui, ClientSession session) throws IOException {
         User user = getUserFromPromptingUI(ui);
         return new CreateAccountCommand(user);
     }
@@ -50,8 +50,8 @@ public final class CreateAccountCommand implements Command {
      * {@inheritDoc}
      */
     @Override
-    public <R, C> R accept(CommandVisitor<R, C> visitor, C context) {
-        return visitor.visit(this, context);
+    public <R, C> R accept(CommandVisitor<R, C> visitor, C session) {
+        return visitor.visit(this, session);
     }
 
     public User getUser() {

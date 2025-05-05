@@ -1,6 +1,6 @@
 package cz.cuni.mff.danekji1.calendar.core.commands;
 
-import cz.cuni.mff.danekji1.calendar.core.session.Session;
+import cz.cuni.mff.danekji1.calendar.core.session.ClientSession;
 import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
 
 import java.util.Map;
@@ -18,7 +18,7 @@ public final class HelpCommand implements Command {
     }
 
     @Override
-    public Command buildCommand(UserInterface ui, Session context) {
+    public Command buildCommand(UserInterface ui, ClientSession session) {
         return new HelpCommand(ui.getCommandRegistry());
     }
 
@@ -38,8 +38,8 @@ public final class HelpCommand implements Command {
     }
 
     @Override
-    public <R, C> R accept(CommandVisitor<R, C> visitor, C context) {
-        return visitor.visit(this, context);
+    public <R, C> R accept(CommandVisitor<R, C> visitor, C session) {
+        return visitor.visit(this, session);
     }
 
     public Map<String, Class<? extends Command>> getAvailableCommands() {

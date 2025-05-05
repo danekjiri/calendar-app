@@ -1,10 +1,10 @@
 package cz.cuni.mff.danekji1.calendar.server.storage;
 
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InvalidInputException;
-import cz.cuni.mff.danekji1.calendar.core.exceptions.server.ServerException;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.server.XmlDatabaseException;
 import cz.cuni.mff.danekji1.calendar.core.models.Event;
 import cz.cuni.mff.danekji1.calendar.core.models.User;
+import cz.cuni.mff.danekji1.calendar.core.session.ClientSession;
 import cz.cuni.mff.danekji1.calendar.core.xml.XMLCalendarTags;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,14 +27,19 @@ public final class XMLEventRepository implements EventRepository {
         if (Files.notExists(XML_FILE_FOLDER)) {
             try {
                 Files.createDirectories(XML_FILE_FOLDER);
+                LOGGER.info("Created XML file folder '{}'", XML_FILE_FOLDER.toAbsolutePath());
             } catch (IOException e) {
-                throw new XmlDatabaseException("Failed to create XML file folder");
+                LOGGER.error("Could not create XML file folder '{}': {}", XML_FILE_FOLDER.toAbsolutePath(), e.getMessage());
+                throw new XmlDatabaseException("FATAL ERROR: Failed to create XML file folder.");
             }
         }
     }
 
-
-
+    /**
+     * Creates XML Document containing template for a new calendar.
+     * @param user User for which the calendar will be created
+     * @return XML Document containing template for a new calendar
+     */
     private Document buildNewCalendar(User user) {
         Element calendarElement = new Element(XMLCalendarTags.CALENDAR_TAG);
 
@@ -51,15 +56,14 @@ public final class XMLEventRepository implements EventRepository {
      * Creates a new calendar for the user with the given username and password hash.
      * The calendar is stored in an XML file with the username as the filename.
      *
-     * @param user user for which the calendar will be created
+     * @param user User for which the calendar will be created
      * @throws InvalidInputException if the username is null, empty, or "unlogged".
      */
     @Override
-    public void createAccount(User user) {
-        if (user.username() == null || user.username().isEmpty() || user.username().equals("unlogged")) {
-            throw new InvalidInputException("Username cannot be null or empty or 'unlogged'");
-        }
+    public synchronized void createAccount(User user, ClientSession session) throws XmlDatabaseException {
+        validateUsersUsername(user, session);
         if (Files.exists(getUserFilePath(user.username()))) {
+            LOGGER.error("Client session '{}': The calendar for username '{}' already exists.",session.getSessionId(), user.username());
             throw new InvalidInputException("The calendar for username '" + user.username() + "' already exists");
         }
 
@@ -72,27 +76,35 @@ public final class XMLEventRepository implements EventRepository {
 
             LOGGER.info("Created calendar for user '{}'", user.username());
         } catch (IOException e) {
-            LOGGER.debug("Failed to create calendar for user '{}'", user.username(), e);
+            LOGGER.error("Failed to create calendar for user '{}'", user.username(), e);
             throw new XmlDatabaseException("Failed to create calendar for user '" + user.username() + "'");
         }
     }
 
+    /**
+     * Parses a user's calendar XML file and returns the Document object.
+     * @param file The path to the user's calendar XML file
+     * @return the Document object representing the user's calendar
+     * @throws XmlDatabaseException if an error occurs while parsing the XML file or if the file is not valid calendar
+     */
     private static Document getUserCalendarDocument(Path file) throws XmlDatabaseException {
         try {
             SAXBuilder builder = new SAXBuilder();
             var document = builder.build(file.toFile());
 
             if (document == null) {
+                LOGGER.error("Failed to get calendar from file '{}': File is empty or invalid XML", file);
                 throw new XmlDatabaseException("The XML file is empty");
             }
             if (!document.getRootElement().getName().equals(XMLCalendarTags.CALENDAR_TAG)) {
+                LOGGER.error("The XML file '{}' is not a calendar file", file);
                 throw new XmlDatabaseException("The XML file is not a valid calendar");
             }
 
             return document;
         } catch (Exception e) {
-            LOGGER.debug("Failed to create SAX parser", e);
-            throw new XmlDatabaseException("Failed to create SAX parser");
+            LOGGER.error("Failed to parse file '{}'", file, e);
+            throw new XmlDatabaseException("Failed to parse XML file: " + file);
         }
     }
 
@@ -104,16 +116,9 @@ public final class XMLEventRepository implements EventRepository {
      * @return true if authentication is successful, false otherwise.
      */
     @Override
-    public synchronized boolean authenticate(User user) {
-        if (user.username() == null || user.username().isEmpty() || user.username().equals("unlogged")) {
-            LOGGER.debug("Username cannot be null or empty or 'unlogged'");
-            return false;
-        }
-
-        if (!Files.exists(getUserFilePath(user.username()))) {
-            LOGGER.debug("The calendar for username '{}' does not exist", user.username());
-            return false;
-        }
+    public synchronized boolean authenticate(User user, ClientSession session) {
+        validateUsersUsername(user, session);
+        validateUserRepositoryLocation(user);
 
         var document = getUserCalendarDocument(getUserFilePath(user.username()));
         var calendarElement = document.getRootElement();
@@ -134,8 +139,8 @@ public final class XMLEventRepository implements EventRepository {
      * @return The ID of the added event.
      */
     @Override
-    public long addEvent(User user, Event event) throws XmlDatabaseException, IOException {
-        validateUsersUsername(user);
+    public long addEvent(User user, Event event, ClientSession session) throws XmlDatabaseException, IOException {
+        validateUsersUsername(user, session);
         validateUserRepositoryLocation(user);
 
         var document = getUserCalendarDocument(getUserFilePath(user.username()));
@@ -151,12 +156,22 @@ public final class XMLEventRepository implements EventRepository {
 
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
         outputter.output(document, Files.newOutputStream(getUserFilePath(user.username())));
+        LOGGER.info("Client session '{}': Added new calendar event for user '{}'", session.getSessionId(), user.username());
         return nextEventId;
     }
 
+    /**
+     * Deletes an event from the user's calendar.
+     * The method searches for the event with the given ID and removes it from the XML file.
+     *
+     * @param user The user for which the event will be deleted.
+     * @param eventId The ID of the event to delete.
+     * @param session The client session.
+     * @throws XmlDatabaseException if an error occurs while deleting the event
+     */
     @Override
-    public void deleteEvent(User user, Long eventId) {
-        validateUsersUsername(user);
+    public void deleteEvent(User user, Long eventId, ClientSession session) throws XmlDatabaseException {
+        validateUsersUsername(user, session);
         validateUserRepositoryLocation(user);
 
         var document = getUserCalendarDocument(getUserFilePath(user.username()));
@@ -172,22 +187,32 @@ public final class XMLEventRepository implements EventRepository {
         }
 
         if (!eventFound) {
-            LOGGER.debug("Event with ID '{}' not found in the calendar for user '{}'", eventId, user.username());
+            LOGGER.error("Client session '{}': Event with ID '{}' not found in the calendar for user '{}'", session.getSessionId(), eventId, user.username());
             throw new XmlDatabaseException("Event with ID '" + eventId + "' not found in the calendar");
         }
 
         try {
             XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
             outputter.output(document, Files.newOutputStream(getUserFilePath(user.username())));
+            LOGGER.info("Client session '{}': Deleted event with ID '{}' from calendar for user '{}'", session.getSessionId(), eventId, user.username());
         } catch (IOException e) {
-            LOGGER.debug("Failed to save calendar after deleting event", e);
-            throw new XmlDatabaseException("Failed to save calendar after deleting event");
+            LOGGER.error("Failed to save calendar for user '{}' while deleting event", user.username(), e);
+            throw new XmlDatabaseException("Failed to save '" + user.username() + "' calendar while deleting event");
         }
     }
 
+    /**
+     * Retrieves all events from the user's calendar.
+     * The method reads the XML file and returns a list of events.
+     *
+     * @param user The user for which the events will be retrieved.
+     * @param session The client session.
+     * @return A list of events from the user's calendar.
+     * @throws XmlDatabaseException if an error occurs while retrieving the events
+     */
     @Override
-    public List<Event> getAllEvents(User user) {
-        validateUsersUsername(user);
+    public List<Event> getAllEvents(User user, ClientSession session) throws XmlDatabaseException {
+        validateUsersUsername(user, session);
         validateUserRepositoryLocation(user);
 
         var document = getUserCalendarDocument(getUserFilePath(user.username()));
@@ -199,17 +224,23 @@ public final class XMLEventRepository implements EventRepository {
             events.add(event);
         }
 
+        LOGGER.info("Client session '{}': Retrieved all events for user '{}'", session.getSessionId(), user.username());
         return events;
     }
 
+    /**
+     * Updates an event in the user's calendar.
+     * The method searches for the event with the given ID and updates its details.
+     * If the event detail is null, the previous value is kept.
+     *
+     * @param user The user for which the event will be updated.
+     * @param event The event to update.
+     * @param session The client session.
+     * @throws XmlDatabaseException if an error occurs while updating the event
+     */
     @Override
-    public List<Event> getFutureEvents(User user) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    @Override
-    public void updateEvent(User user, Event event) {
-        validateUsersUsername(user);
+    public void updateEvent(User user, Event event, ClientSession session) throws XmlDatabaseException {
+        validateUsersUsername(user, session);
         validateUserRepositoryLocation(user);
 
         var document = getUserCalendarDocument(getUserFilePath(user.username()));
@@ -234,14 +265,16 @@ public final class XMLEventRepository implements EventRepository {
         }
 
         if (!eventFound) {
+            LOGGER.error("Client session '{}': Event with ID '{}' not found in the calendar for user '{}'", session.getSessionId(), event.getId(), user.username());
             throw new XmlDatabaseException("Event with ID '" + event.getId() + "' not found in the calendar");
         }
 
         try {
             XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
             outputter.output(document, Files.newOutputStream(getUserFilePath(user.username())));
+            LOGGER.info("Client session '{}': Updated event with ID '{}' in calendar for user '{}'", session.getSessionId(), event.getId(), user.username());
         } catch (IOException e) {
-            LOGGER.warn("Failed to modify calendar event", e);
+            LOGGER.error("Failed to modify the '{}' calendar event with ID '{}'",user.username(), event.getId(), e);
             throw new XmlDatabaseException("Failed to modify calendar event");
         }
     }

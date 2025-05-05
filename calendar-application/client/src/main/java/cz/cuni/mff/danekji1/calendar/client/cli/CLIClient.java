@@ -9,9 +9,9 @@ import cz.cuni.mff.danekji1.calendar.core.Client;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
-import cz.cuni.mff.danekji1.calendar.core.session.Session;
 import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,6 +27,7 @@ public final class CLIClient implements Client {
     private ObjectInputStream in;
     private final UserInterface ui;
     private ClientSession session;
+    private boolean isConnected = false;
 
     public boolean isConnectionOpen() {
         return socket != null &&  socket.isConnected() && !socket.isClosed();
@@ -41,7 +42,7 @@ public final class CLIClient implements Client {
     }
 
     @Override
-    public Session getCurrentSession() {
+    public ClientSession getCurrentSession() {
         assert session != null;
         return session;
     }
@@ -57,10 +58,11 @@ public final class CLIClient implements Client {
             in = new ObjectInputStream(socket.getInputStream());
 
             int sessionId = (int) in.readObject();
-            session = new ClientSession(sessionId);
+            session = new ClientSession(sessionId, new InetSocketAddress(host, port));
             LOGGER.info("Connected to '{}:{}' with sessionId '{}'", host, port, sessionId);
+            isConnected = true;
         } catch (Exception e) {
-            LOGGER.fatal("Failed to connect to '{}:{}', because of '{}'", host, port, e);
+            LOGGER.fatal("Failed to connect to '{}:{}'", host, port, e);
         }
     }
 
@@ -77,6 +79,11 @@ public final class CLIClient implements Client {
     }
 
     public void start() {
+        if (!isConnectionOpen()) {
+            LOGGER.fatal("Connection to server is not open. Please connect to the server first.");
+            return;
+        }
+
         ui.start(this);
     }
 

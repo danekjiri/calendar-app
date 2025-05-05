@@ -10,11 +10,11 @@ import java.io.IOException;
  * Visitor interface for processing responses on client side.
  */
 public interface ResponseVisitor<R, C> {
-    R visit(SuccessResponse response, C context) throws IOException;
-    R visit(SuccessLoginResponse response, C context)throws IOException;
-    R visit(SuccessLogoutResponse response, C context)throws IOException;
-    R visit(SuccessEventListResponse response, C context)throws IOException;
-    R visit(SuccessQuit response, C context) throws IOException;
+    R visit(SuccessResponse response, C session) throws IOException;
+    R visit(SuccessLoginResponse response, C session)throws IOException;
+    R visit(SuccessLogoutResponse response, C session)throws IOException;
+    R visit(SuccessEventListResponse response, C session)throws IOException;
+    R visit(SuccessQuit response, C session) throws IOException;
 
-    R visit(ErrorResponse response, C context)throws IOException;
+    R visit(ErrorResponse response, C session)throws IOException;
 }

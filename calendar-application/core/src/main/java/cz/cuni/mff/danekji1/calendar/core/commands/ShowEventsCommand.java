@@ -1,7 +1,7 @@
 package cz.cuni.mff.danekji1.calendar.core.commands;
 
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InsufficientCommandPrivilegesException;
-import cz.cuni.mff.danekji1.calendar.core.session.Session;
+import cz.cuni.mff.danekji1.calendar.core.session.ClientSession;
 import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
 
 public final class ShowEventsCommand implements Command {
@@ -10,8 +10,8 @@ public final class ShowEventsCommand implements Command {
     private ShowEventsCommand() {}
 
     @Override
-    public Command buildCommand(UserInterface ui, Session context) {
-        if (!context.isLoggedIn()) {
+    public Command buildCommand(UserInterface ui, ClientSession session) {
+        if (!session.isLoggedIn()) {
             throw new InsufficientCommandPrivilegesException("You must be logged in to list events.");
         }
 
@@ -34,7 +34,7 @@ public final class ShowEventsCommand implements Command {
     }
 
     @Override
-    public <R, C> R accept(CommandVisitor<R, C> visitor, C context) {
-        return visitor.visit(this, context);
+    public <R, C> R accept(CommandVisitor<R, C> visitor, C session) {
+        return visitor.visit(this, session);
     }
 }
