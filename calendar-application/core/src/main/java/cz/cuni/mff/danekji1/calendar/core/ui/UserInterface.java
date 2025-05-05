@@ -15,5 +15,5 @@ public interface UserInterface {
     void start(Client client);
     void displayResponse(Response response, ClientSession session) throws IOException;
     String promptForInput(String message) throws IOException;
-    Map<String, Class<? extends Command>> getCommandRegistry();
+    Map<String, Class<? extends Command>> getUnmodifiableCommandRegistry();
 }

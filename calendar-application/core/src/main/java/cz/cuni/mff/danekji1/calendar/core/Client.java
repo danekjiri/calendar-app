@@ -9,7 +9,6 @@ import java.io.IOException;
 public interface Client {
     void connect(String host, int port);
     void start();
-    void disconnect();
     boolean isConnectionOpen();
     ClientSession getCurrentSession();
     Response sendCommand(Command command) throws ClassNotFoundException, IOException;

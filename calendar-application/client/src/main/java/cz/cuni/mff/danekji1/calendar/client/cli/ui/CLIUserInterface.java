@@ -16,7 +16,8 @@ import java.util.Map;
 import java.util.Scanner;
 
 /**
- * A simple command-line user interface.
+ * Command Line Interface (CLI) for the calendar client.
+ * This class handles user input and output, command parsing, and response handling.
  */
 public final class CLIUserInterface implements UserInterface {
     private static final Logger LOGGER = LogManager.getLogger(CLIUserInterface.class);
@@ -26,10 +27,17 @@ public final class CLIUserInterface implements UserInterface {
     private final ResponseVisitor<Void, ClientSession> responseDispatcher;
     private final CLICommandParser parser;
 
+    /**
+     * Constructor for CLIUserInterface.
+     * Initializes the input and output streams and registers commands.
+     *
+     * @param userInput  Input stream for user input (e.g., System.in).
+     * @param userOutput Output stream for user output (e.g., System.out).
+     */
     public CLIUserInterface(InputStream userInput, OutputStream userOutput) {
         this.userInput = new Scanner(userInput);
         this.userOutput = new OutputStreamWriter(userOutput);
-        this.responseDispatcher = new DefaultCLIResponseDispatcher(userOutput);
+        this.responseDispatcher = new CLIResponseDispatcher(userOutput);
 
         this.parser = new CLICommandParser();
         // Register all commands
@@ -45,14 +53,21 @@ public final class CLIUserInterface implements UserInterface {
         // ... add more commands as needed
     }
 
+    /**
+     * Gets an unmodifiable view of the command registry.
+     *
+     * @return An unmodifiable map of command names to their corresponding classes.
+     */
     @Override
-    public Map<String, Class<? extends Command>> getCommandRegistry() {
-        return parser.getCommandRegistry();
+    public Map<String, Class<? extends Command>> getUnmodifiableCommandRegistry() {
+        return parser.getUnmodifiableCommandRegistry();
     }
 
     /**
      * The main entry point for the CLI.
      * It reads commands from the console and sends them to the client.
+     *
+     * @param client The client that will handle the network communication.
      */
     @Override
     public void start(Client client) {
@@ -85,9 +100,15 @@ public final class CLIUserInterface implements UserInterface {
         }
     }
 
+    /**
+     * Displays the help message to the user.
+     * This method sends a request to the server for help information and displays the response.
+     *
+     * @param client The client instance to send the help command.
+     */
     private void displayHelpMessage(Client client) {
         try {
-            Command helpCommand = new HelpCommand(parser.getCommandRegistry());
+            Command helpCommand = new HelpCommand(parser.getUnmodifiableCommandRegistry());
             Response helpResponse = client.sendCommand(helpCommand);
             displayResponse(helpResponse, client.getCurrentSession());
         } catch (Exception e) {
@@ -98,6 +119,9 @@ public final class CLIUserInterface implements UserInterface {
     /**
      * Formats the prompt for the user.
      * The prompt includes the username and a fixed string.
+     *
+     * @param session The current client session.
+     * @return The formatted prompt string.
      */
     private String formatUserPrompt(ClientSession session) {
         return String.format("\n$%s@calendar> ", session.getCurrentUser() != null
@@ -107,12 +131,22 @@ public final class CLIUserInterface implements UserInterface {
     /**
      * Displays the response from the server.
      * This method uses the Visitor pattern to handle different types of responses.
+     *
+     * @param response The response to display.
+     * @param session The current client session.
      */
     @Override
     public void displayResponse(Response response, ClientSession session) throws IOException {
         response.accept(responseDispatcher, session);
     }
 
+    /**
+     * Displays a message to the user and returns the users input.
+     * This method writes the message to the output stream and flushes it.
+     *
+     * @param message The message to display to the user.
+     * @return The user's input as a string.
+     */
     @Override
     public String promptForInput(String message) throws IOException {
         userOutput.write(message);
