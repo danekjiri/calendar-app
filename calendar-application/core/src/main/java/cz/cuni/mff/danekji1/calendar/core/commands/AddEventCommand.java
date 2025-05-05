@@ -1,6 +1,6 @@
 package cz.cuni.mff.danekji1.calendar.core.commands;
 
-import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InsufficientCommandPrivilegesException;
+import cz.cuni.mff.danekji1.calendar.core.exceptions.InsufficientCommandPrivilegesException;
 import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InvalidInputException;
 import cz.cuni.mff.danekji1.calendar.core.models.Event;
 import cz.cuni.mff.danekji1.calendar.core.session.ClientSession;
@@ -11,20 +11,42 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 
+/**
+ * Command to add an event to the calendar.
+ */
 public final class AddEventCommand implements Command {
     public static final String COMMAND_NAME = "add_event";
     private final Event event;
 
+    /**
+     * Constructor for creating an AddEventCommand with the specified event.
+     *
+     * @param event The event to be added.
+     */
     public AddEventCommand(Event event) {
         this.event = event;
     }
 
+    // Default constructor for reflection API to build command
     private AddEventCommand() {
         this(null);
     }
 
+    /**
+     * The method builds the command by prompting the user for input.
+     * If the user is not logged in or invalid input is provided, an exception is thrown.
+     * Location and description are optional.
+     *
+     * @param ui The user interface
+     * @param session The client session
+     * @return The {@link AddEventCommand} command
+     * @throws IOException If an I/O error occurs
+     * @throws InsufficientCommandPrivilegesException If the user is not logged in
+     * @throws InvalidInputException If the input is invalid for given prompt
+     */
     @Override
-    public Command buildCommand(UserInterface ui, ClientSession session) throws IOException {
+    public Command buildCommand(UserInterface ui, ClientSession session)
+            throws IOException, InsufficientCommandPrivilegesException,  InvalidInputException {
         if (!session.isLoggedIn()) {
             throw new InsufficientCommandPrivilegesException("You must be logged in to add an event");
         }
@@ -63,6 +85,9 @@ public final class AddEventCommand implements Command {
         return new AddEventCommand(event);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getName() {
         return COMMAND_NAME;
@@ -88,10 +113,16 @@ public final class AddEventCommand implements Command {
      * {@inheritDoc}
      */
     @Override
-    public <R, C> R accept(CommandVisitor<R, C> visitor, C session) {
+    public <R, S> R accept(CommandVisitor<R, S> visitor, S session) {
         return visitor.visit(this, session);
     }
 
+    /**
+     * Gets the event stored in this command.
+     * The event is without id, as it is not yet stored in the database.
+     *
+     * @return The event without id
+     */
     public Event getEvent() {
         return event;
     }

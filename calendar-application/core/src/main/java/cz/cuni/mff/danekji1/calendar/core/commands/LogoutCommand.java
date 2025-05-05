@@ -1,24 +1,36 @@
 package cz.cuni.mff.danekji1.calendar.core.commands;
 
-import cz.cuni.mff.danekji1.calendar.core.exceptions.client.InsufficientCommandPrivilegesException;
+import cz.cuni.mff.danekji1.calendar.core.exceptions.InsufficientCommandPrivilegesException;
 import cz.cuni.mff.danekji1.calendar.core.session.ClientSession;
 import cz.cuni.mff.danekji1.calendar.core.ui.UserInterface;
 
+/**
+ * Command to log out from the current logged account.
+ * The command is available only for logged users and unset the current user in the session.
+ */
 public final class LogoutCommand implements Command {
     public static final String COMMAND_NAME = "logout";
 
+    /**
+     * The method builds the command by checking if the user is logged in.
+     *
+     * @param ui The user interface
+     * @param session The client session
+     * @return The {@link LogoutCommand} command
+     * @throws InsufficientCommandPrivilegesException If the user is not logged in
+     */
     @Override
-    public Command buildCommand(UserInterface ui, ClientSession session) {
-        if (! session.isLoggedIn()) {
+    public Command buildCommand(UserInterface ui, ClientSession session) throws InsufficientCommandPrivilegesException {
+        if (!session.isLoggedIn()) {
             throw new InsufficientCommandPrivilegesException("You must be logged to logout");
         }
 
         return new LogoutCommand();
     }
 
-    public LogoutCommand() {
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getName() {
         return COMMAND_NAME;
