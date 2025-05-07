@@ -24,7 +24,7 @@ The project is documented using JavaDoc. To generate the documentation, run the 
 
 The generated documentation will be available in the `target/reports/apidocs/` directory of the *project root*. [docs](calendar-application/target/reports/apidocs/index.html)
 
-For user documentation, please refer to the `docs` directory. The user documentation is available in the `docs/user_guide.md` file. [user_guide](calendar-application/docs/user_guide.md)
+For user documentation, please refer to the `docs` directory. The user documentation is available in the `docs/user_guide.md` file. [user_guide](docs/user_guide.md)
 
 ## Modules
 
