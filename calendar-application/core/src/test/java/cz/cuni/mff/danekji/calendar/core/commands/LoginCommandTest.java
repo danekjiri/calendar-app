@@ -8,21 +8,21 @@ import cz.cuni.mff.danekji.calendar.core.client.ui.UserInterface;
 import cz.cuni.mff.danekji.calendar.core.exceptions.client.InvalidInputException;
 import cz.cuni.mff.danekji.calendar.core.models.User;
 
-public class CreateAccountCommandTest {
+public class LoginCommandTest {
 
     @Test
     public void buildCommand_createsUserFromInput() throws Exception {
         // arrange
         UserInterface mockUI = mock(UserInterface.class);
         ClientSession mockSession = mock(ClientSession.class);
-        when(mockUI.promptForInput(anyString())).thenReturn("bob", "password");
+        when(mockUI.promptForInput(anyString())).thenReturn("alice", "password");
 
         // act
-        CreateAccountCommand command = (CreateAccountCommand) new CreateAccountCommand().buildCommand(mockUI, mockSession);
+        LoginCommand command = (LoginCommand) new LoginCommand().buildCommand(mockUI, mockSession);
         User user = command.getUser();
 
         // assert
-        assertEquals("bob", user.username());
+        assertEquals("alice", user.username());
         assertEquals("password".hashCode(), user.passwordHash());
     }
 
@@ -35,6 +35,6 @@ public class CreateAccountCommandTest {
 
         // act & assert
         assertThrows(InvalidInputException.class, () ->
-                new CreateAccountCommand().buildCommand(mockUI, mockSession));
+                new LoginCommand().buildCommand(mockUI, mockSession));
     }
 }

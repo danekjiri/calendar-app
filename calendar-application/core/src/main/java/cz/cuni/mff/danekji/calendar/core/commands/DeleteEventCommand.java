@@ -31,7 +31,7 @@ public final class DeleteEventCommand implements Command {
     }
 
     // Default constructor for reflection API to build command
-    private DeleteEventCommand() {
+    DeleteEventCommand() {
         this(null);
     }
 

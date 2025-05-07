@@ -32,7 +32,7 @@ public final class CreateAccountCommand implements Command {
     }
 
     // Default constructor for reflection API to build command
-    private CreateAccountCommand() {
+    CreateAccountCommand() {
         this(null);
     }
 

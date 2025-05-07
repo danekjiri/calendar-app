@@ -36,7 +36,7 @@ public final class AddEventCommand implements Command {
     }
 
     // Default constructor for reflection API to build command
-    private AddEventCommand() {
+    AddEventCommand() {
         this(null);
     }
 

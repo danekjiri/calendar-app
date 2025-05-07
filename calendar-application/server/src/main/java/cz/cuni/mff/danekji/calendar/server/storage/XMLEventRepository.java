@@ -127,7 +127,7 @@ public final class XMLEventRepository implements EventRepository {
      * @return the Document object representing the user's calendar
      * @throws XmlDatabaseException if an error occurs while parsing the XML file or if the file is not valid calendar
      */
-    private static Document getUserCalendarDocument(Path file) throws XmlDatabaseException {
+    static Document getUserCalendarDocument(Path file) throws XmlDatabaseException {
         try {
             SAXBuilder builder = new SAXBuilder();
             var document = builder.build(file.toFile());

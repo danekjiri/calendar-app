@@ -37,7 +37,7 @@ public final class UpdateEventCommand implements Command {
     }
 
     // Default constructor for reflection API to build command
-    private UpdateEventCommand() {
+    UpdateEventCommand() {
         this(null);
     }
 

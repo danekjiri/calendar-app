@@ -82,7 +82,7 @@ public final class Event implements Serializable {
         return new Event(id, event.title, event.date, event.time, event.location, event.description);
     }
 
-    private Event(Long id, String title, LocalDate date, LocalTime time, String location, String description) {
+    Event(Long id, String title, LocalDate date, LocalTime time, String location, String description) {
         this.id = id;
         this.title = title;
         this.date = date;

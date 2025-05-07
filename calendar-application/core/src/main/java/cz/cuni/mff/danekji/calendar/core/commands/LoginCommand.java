@@ -32,7 +32,7 @@ public final class LoginCommand implements Command {
     }
 
     // Default constructor for reflection API to build command
-    private LoginCommand() {
+    LoginCommand() {
         this(null);
     }
 

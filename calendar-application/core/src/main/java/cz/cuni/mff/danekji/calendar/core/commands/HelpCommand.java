@@ -29,7 +29,7 @@ public final class HelpCommand implements Command {
     }
 
     // Default constructor for reflection API to build command
-    private HelpCommand() {
+    HelpCommand() {
         this(null);
     }
 
