@@ -1,6 +1,7 @@
 package cz.cuni.mff.danekji.calendar.server;
 
 import cz.cuni.mff.danekji.calendar.core.commands.*;
+import cz.cuni.mff.danekji.calendar.core.models.User;
 import cz.cuni.mff.danekji.calendar.core.responses.success.*;
 import cz.cuni.mff.danekji.calendar.core.exceptions.CalendarException;
 import cz.cuni.mff.danekji.calendar.core.exceptions.server.XmlDatabaseException;
@@ -126,8 +127,9 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Client
             return new ErrorResponse("You are not logged in.");
         }
 
+        User currentUser = session.getCurrentUser();
         session.unsetCurrentUser();
-        LOGGER.info("Client session '{}': User '{}' logged out.", session.getSessionId(), session.getCurrentUser().username());
+        LOGGER.info("Client session '{}': User '{}' logged out.", session.getSessionId(), currentUser.username());
         return new SuccessLogoutResponse("Logout successful.");
     }
 

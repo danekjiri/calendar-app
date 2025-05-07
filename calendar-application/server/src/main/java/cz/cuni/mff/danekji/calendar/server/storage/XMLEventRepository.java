@@ -180,7 +180,7 @@ public final class XMLEventRepository implements EventRepository {
      * @throws XmlDatabaseException if an error occurs while adding the event
      */
     @Override
-    public long addEvent(User user, Event event, ClientSession session) throws XmlDatabaseException, IOException {
+    public synchronized long addEvent(User user, Event event, ClientSession session) throws XmlDatabaseException, IOException {
         validateUsersUsername(user, session);
         validateUserRepositoryLocation(user);
 
@@ -211,7 +211,7 @@ public final class XMLEventRepository implements EventRepository {
      * @throws XmlDatabaseException if an error occurs while deleting the event
      */
     @Override
-    public void deleteEvent(User user, Long eventId, ClientSession session) throws XmlDatabaseException {
+    public synchronized void deleteEvent(User user, Long eventId, ClientSession session) throws XmlDatabaseException {
         validateUsersUsername(user, session);
         validateUserRepositoryLocation(user);
 
@@ -280,7 +280,7 @@ public final class XMLEventRepository implements EventRepository {
      * @throws XmlDatabaseException if an error occurs while updating the event
      */
     @Override
-    public void updateEvent(User user, Event event, ClientSession session) throws XmlDatabaseException {
+    public synchronized void updateEvent(User user, Event event, ClientSession session) throws XmlDatabaseException {
         validateUsersUsername(user, session);
         validateUserRepositoryLocation(user);
 

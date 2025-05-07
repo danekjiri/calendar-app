@@ -173,7 +173,14 @@ public class Server {
      * @param args Command line arguments (not used).
      */
     public static void main(String[] args) {
+        if (args.length > 1) {
+            LOGGER.error("Usage: mvn exec:java -Dexec.args=\"<port>\"");
+            return;
+        }
+
+        final int port = args.length == 0 ? 8080 : Integer.parseInt(args[0]);
+
         Server server = new Server(new XMLEventRepository());
-        server.start(8080);
+        server.start(port);
     }
 }

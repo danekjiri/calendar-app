@@ -40,7 +40,9 @@ The project is organized as a multi-module Maven project with three sub-modules:
   Implements the server-side logic, including handling concurrent client connections, session management, command dispatch (using the Visitor pattern), and persistence (using XML via the default Java DOM parser). The server ensures that only logged‐in users may perform privileged actions (such as adding events).
 
 ## Future Enhancements
-- **Command Enhancements**: Add more commands and features to the client and server, such as event reminders, recurring events, etc.
+- **Command Enhancements**:
+  -  add show_future_events command
+  -  add delete_user command
+- **Limit users on server**: Limit the number and only one logged user of given username
 - **GUI**: Implement a graphical user interface for the client to enhance user experience.
 - **Database**: Integrate a more robust database system (e.g., PostgreSQL, MySQL) for better data management and scalability.
-- ...

@@ -72,10 +72,17 @@ public final class CLIClient implements Client {
     }
 
     public static void main(String[] args) {
+        if (args.length > 2 || args.length == 1) {
+            LOGGER.error("Usage: mvn exec:java -Dexec.args=\"<server-address> <port>\"");
+            return;
+        }
+
+        final String address = args.length == 0 ? "127.0.0.1" : args[0];
+        final int port = args.length == 0 ? 8080 : Integer.parseInt(args[1]);
+
         UserInterface ui = new CLIUserInterface(System.in, System.out);
-        NetworkHandler networkHandler = new SocketNetworkHandler();
-        Client client = new CLIClient(ui, networkHandler);
-        client.connect("127.0.0.1", 8080);
+        Client client = new CLIClient(ui, new SocketNetworkHandler());
+        client.connect(address, port);
         client.start();
     }
 }
