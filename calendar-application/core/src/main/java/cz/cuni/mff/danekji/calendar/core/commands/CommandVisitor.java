@@ -96,5 +96,14 @@ public interface CommandVisitor<R, S> {
      */
     R visit(DeleteUserCommand command, S session);
 
+    /**
+     * Show all future events for the logged user.
+     *
+     * @param command The {@link ShowFutureEventsCommand} to be processed.
+     * @param session The session in which the command will be processed.
+     * @return The result of the command execution.
+     */
+    R visit(ShowFutureEventsCommand command, S session);
+
     // more to be added as needed...
 }

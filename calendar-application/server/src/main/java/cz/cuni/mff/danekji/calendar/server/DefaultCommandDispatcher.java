@@ -1,6 +1,7 @@
 package cz.cuni.mff.danekji.calendar.server;
 
 import cz.cuni.mff.danekji.calendar.core.commands.*;
+import cz.cuni.mff.danekji.calendar.core.models.Event;
 import cz.cuni.mff.danekji.calendar.core.models.User;
 import cz.cuni.mff.danekji.calendar.core.responses.success.*;
 import cz.cuni.mff.danekji.calendar.core.exceptions.CalendarException;
@@ -14,6 +15,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Default implementation of the {@link CommandVisitor} interface.
@@ -279,6 +283,39 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Client
             return new SuccessDeleteUserResponse("Account '" + deletedUsername + "' has been successfully deleted.");
         } catch (CalendarException | IOException e) {
             return new ErrorResponse(e.getMessage());
+        }
+    }
+
+
+    /**
+     * The implementation of the CommandVisitor endpoint for ShowFutureEventsCommand.
+     * Retrieves all events for the logged-in user and filters them based on the provided date range.
+     *
+     * @param command The {@link ShowFutureEventsCommand} command
+     * @param session The client session
+     * @return A {@link SuccessEventListResponse} with filtered events, or an {@link ErrorResponse} on failure.
+     */
+    @Override
+    public Response visit(ShowFutureEventsCommand command, ClientSession session) {
+        if (!session.isLoggedIn()) {
+            LOGGER.error("Client session '{}': Attempt to show future events while not logged in.", session.getSessionId());
+            return new ErrorResponse("You must be logged in to show events.");
+        }
+
+        try {
+            List<Event> allEvents = eventRepository.getAllEvents(session.getCurrentUser(), session);
+
+            final LocalDate startDate = command.getStartDate();
+            final LocalDate endDate = command.getEndDate();
+
+            List<Event> filteredEvents = allEvents.stream()
+                    .filter(event -> !event.getDate().isBefore(startDate) && !event.getDate().isAfter(endDate))
+                    .collect(Collectors.toList());
+
+            return new SuccessEventListResponse(filteredEvents);
+
+        } catch (XmlDatabaseException e) {
+            return new ErrorResponse("Failed to retrieve events: " + e.getMessage());
         }
     }
 }
