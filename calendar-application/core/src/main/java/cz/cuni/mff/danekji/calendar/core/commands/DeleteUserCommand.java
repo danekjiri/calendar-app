@@ -18,10 +18,13 @@ public final class DeleteUserCommand implements Command {
      */
     public static final String COMMAND_NAME = "delete_user";
 
+    /**
+     * The user object containing the username and password hash for verification.
+     */
     private final User user;
 
     /**
-     * Constructor for DeleteUserCommand.
+     * Constructor for creating the command with a user object.
      * @param user The user object containing the username and password hash for verification.
      */
     public DeleteUserCommand(User user) {
