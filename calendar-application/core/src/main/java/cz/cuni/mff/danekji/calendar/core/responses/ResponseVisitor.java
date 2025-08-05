@@ -71,4 +71,14 @@ public interface ResponseVisitor<R, S> {
      * @throws IOException if an I/O error occurs
      */
     R visit(ErrorResponse response, S session)throws IOException;
+
+    /**
+     * Successful event deletion response handle presentation of success message to user
+     *
+     * @param response The {@link SuccessDeleteUserResponse} to be processed
+     * @param session  The client session to be give a context for update
+     * @return The result of processing the response (in this case Void)
+     * @throws IOException if an I/O error occurs
+     */
+    R visit(SuccessDeleteUserResponse response, S session) throws IOException;
 }

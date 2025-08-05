@@ -137,4 +137,22 @@ public class CLIResponseDispatcher implements ResponseVisitor<Void, ClientSessio
         output.flush();
         return null;
     }
+
+    /**
+     * The visitor endpoint for SuccessDeleteUserResponse.
+     * It handles the response by writing the message to the output and unsetting the
+     * current user in the session.
+     *
+     * @param response The {@link SuccessDeleteUserResponse} to be processed.
+     * @param session The client session associated with the response.
+     * @return Void
+     * @throws IOException If an I/O error occurs while writing to the output stream.
+     */
+    @Override
+    public Void visit(SuccessDeleteUserResponse response, ClientSession session) throws IOException {
+        output.write(response.message() + "\n");
+        session.unsetCurrentUser();
+        output.flush();
+        return null;
+    }
 }
