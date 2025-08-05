@@ -38,6 +38,16 @@ public interface UserInterface {
     String promptForInput(String message) throws IOException;
 
     /**
+     * Asks the user for a password using displayed message and returns the input.
+     * The password input should not be echoed to the console.
+     *
+     * @param message The message to be displayed
+     * @return The password input from the user
+     * @throws IOException if an I/O error occurs (displaying the message)
+     */
+    String promptForPassword(String message) throws IOException;
+
+    /**
      * Gets the unmodifiable command registry that maps command names to their classes.
      * @return The unmodifiable command registry
      */

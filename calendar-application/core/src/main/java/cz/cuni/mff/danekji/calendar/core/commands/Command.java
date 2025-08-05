@@ -68,7 +68,7 @@ public interface Command extends Serializable {
             throw new InvalidInputException("Username cannot be empty or 'unlogged'");
         }
 
-        String password = ui.promptForInput("Enter password: ");
+        String password = ui.promptForPassword("Enter password: ");
         if (password.isEmpty()) {
             throw new InvalidInputException("Password cannot be empty");
         }

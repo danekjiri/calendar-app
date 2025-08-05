@@ -156,4 +156,27 @@ public final class CLIUserInterface implements UserInterface {
 
         return userInput.nextLine();
     }
+
+    /**
+     * Prompts the user for a password.
+     * This method is currently a placeholder and does not implement actual password input handling.
+     *
+     * @param message The message to display to the user.
+     * @return An empty string as a placeholder for the password input.
+     * @throws IOException if an I/O error occurs (displaying the message)
+     */
+    @Override
+    public String promptForPassword(String message) throws IOException {
+        Console console = System.console();
+        if (console == null) {
+            throw new IOException("No console available for password input. Please run from a command line.");
+        }
+
+        char[] passwordArray = console.readPassword(message);
+
+        if (passwordArray == null) {
+            throw new IOException("Password input was cancelled or failed.");
+        }
+        return new String(passwordArray);
+    }
 }
