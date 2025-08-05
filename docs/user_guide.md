@@ -201,7 +201,7 @@ Event list:
 ### Deleting an event
 
 - This command removes an event from logged-in users calendar by specified id.
-- Enter: `update_event`
+- Enter: `delete_event`
 - At a prompt input an id of event that will be deleted
 - If invalid id is passed or some error occures during the deletion process on server-side, an error message is displayed
 
