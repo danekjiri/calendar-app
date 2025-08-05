@@ -90,4 +90,14 @@ public interface EventRepository {
             throw new ServerException("Username cannot be null or empty or 'unlogged'");
         }
     }
+
+    /**
+     * Deletes a user's account and all associated data.
+     *
+     * @param user The user to delete, including credentials for verification.
+     * @param session The client session.
+     * @throws XmlDatabaseException if the user does not exist or deletion fails.
+     * @throws IOException if an I/O error occurs.
+     */
+    void deleteUser(User user, ClientSession session) throws XmlDatabaseException, IOException;
 }

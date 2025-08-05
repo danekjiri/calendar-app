@@ -16,6 +16,7 @@ import org.jdom2.output.XMLOutputter;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -317,6 +318,29 @@ public final class XMLEventRepository implements EventRepository {
         } catch (IOException e) {
             LOGGER.error("Failed to modify the '{}' calendar event with ID '{}'",user.username(), event.getId(), e);
             throw new XmlDatabaseException("Failed to modify calendar event");
+        }
+    }
+
+    @Override
+    public synchronized void deleteUser(User user, ClientSession session) throws XmlDatabaseException, IOException {
+        validateUsersUsername(user, session);
+        validateUserRepositoryLocation(user);
+
+        // Re-authenticate before deletion for security
+        if (!authenticate(user, session)) {
+            LOGGER.warn("Client session '{}': Failed attempt to delete user '{}' due to invalid credentials.", session.getSessionId(), user.username());
+            throw new XmlDatabaseException("Invalid password. Account deletion failed.");
+        }
+
+        try {
+            Files.delete(getUserFilePath(user.username()));
+            LOGGER.info("Client session '{}': Successfully deleted user account and data for '{}'.", session.getSessionId(), user.username());
+        } catch (NoSuchFileException e) {
+            LOGGER.error("Client session '{}': Tried to delete non-existent user file for '{}'.", session.getSessionId(), user.username(), e);
+            throw new XmlDatabaseException("User data file not found for deletion.");
+        } catch (IOException e) {
+            LOGGER.error("Client session '{}': Failed to delete user file for '{}'.", session.getSessionId(), user.username(), e);
+            throw new XmlDatabaseException("A critical error occurred while deleting your account data.");
         }
     }
 }
