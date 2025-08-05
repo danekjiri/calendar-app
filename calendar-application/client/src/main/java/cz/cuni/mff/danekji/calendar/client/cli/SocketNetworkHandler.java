@@ -13,9 +13,15 @@ import java.net.Socket;
  * This handler is responsible for connecting to a server, sending commands, receiving responses,
  */
 public class SocketNetworkHandler implements NetworkHandler {
-    private Socket socket;
-    private ObjectOutputStream out;
-    private ObjectInputStream in;
+    private Socket socket = null;
+    private ObjectOutputStream out = null;
+    private ObjectInputStream in = null;
+
+    /**
+     * Default constructor for SocketNetworkHandler.
+     * The initialization of the object sockets will be done in the connect method.
+     */
+    public SocketNetworkHandler() {}
 
     /**
      * Establishes a connection to the server at the specified host and port.
