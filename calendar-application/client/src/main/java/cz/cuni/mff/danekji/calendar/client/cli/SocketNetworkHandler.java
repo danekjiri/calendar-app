@@ -8,11 +8,24 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+/**
+ * Represents a network handler that communicates using object streams over a socket.
+ * This handler is responsible for connecting to a server, sending commands, receiving responses,
+ */
 public class SocketNetworkHandler implements NetworkHandler {
     private Socket socket;
     private ObjectOutputStream out;
     private ObjectInputStream in;
 
+    /**
+     * Establishes a connection to the server at the specified host and port.
+     *
+     * @param host The hostname or IP address of the server.
+     * @param port The port number on which the server is listening.
+     * @return The session ID received from the server.
+     * @throws IOException While invalid session ID is received or if an I/O error occurs during connection.
+     * @throws ClassNotFoundException If the session ID cannot be deserialized.
+     */
     @Override
     public int connect(String host, int port) throws IOException, ClassNotFoundException {
         socket = new Socket(host, port);
@@ -27,6 +40,14 @@ public class SocketNetworkHandler implements NetworkHandler {
         }
     }
 
+    /**
+     * Sends a command to the server and waits for a response.
+     *
+     * @param command The command to send.
+     * @return The response from the server.
+     * @throws IOException            If an I/O error occurs while sending or receiving data.
+     * @throws ClassNotFoundException If the response cannot be deserialized.
+     */
     @Override
     public Response sendCommand(Command command) throws IOException, ClassNotFoundException {
         out.writeObject(command);
@@ -34,6 +55,11 @@ public class SocketNetworkHandler implements NetworkHandler {
         return (Response) in.readObject();
     }
 
+    /**
+     * Closes the connection to the server.
+     *
+     * @throws IOException If an I/O error occurs while closing the socket.
+     */
     @Override
     public void disconnect() throws IOException {
         if (socket != null && !socket.isClosed()) {
@@ -41,6 +67,11 @@ public class SocketNetworkHandler implements NetworkHandler {
         }
     }
 
+    /**
+     * Checks if the network handler is currently connected to the server.
+     *
+     * @return true if connected, false otherwise.
+     */
     @Override
     public boolean isConnected() {
         return socket != null && socket.isConnected() && !socket.isClosed();
