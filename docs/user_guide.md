@@ -111,7 +111,7 @@ Example:
 ```
 $unlogged@calendar> create_account
 Enter username: alice
-Enter password: ilovebob123
+Enter password: ***
 Account for account 'alice' created successfully.
 
 ```
@@ -127,7 +127,7 @@ Example:
 ```
 $unlogged@calendar> login
 Enter username: alice
-Enter password: ilovebob123
+Enter password: ***
 Login as user 'alice' is successful.
 
 $alice@calendar> 
@@ -236,7 +236,7 @@ $unlogged@calendar>
 
 ### Quitting the application
 
-- This command quit the application (informas server that he can close the session with client)
+- This command quit the application (informs server that he can close the session with client)
 - Enter: `quit`
 
 Example:
@@ -244,6 +244,42 @@ Example:
 $unlogged@calendar> quit
 Quitting...
 ```
+
+## Showing Future Events
+
+- This command lists events for a specific upcoming period that you choose from a menu.
+- Enter: `show_future_events`
+- The user has to be logged-in; hw will be prompted to select a period: Tomorrow, This Week, This Month, This Year, or a Custom Date Range.
+
+```
+$alice@calendar> show_future_events
+Select a period to show future events:
+1. Tomorrow
+2. This Week
+3. This Month
+4. This Year
+5. Custom Date Range
+   Enter your choice (1-5): 3
+   Event list:
+   Event { id=1, title='date with bob', date='2025-08-04', time='15:15', location='Pub Local', description=''}
+   Event { id=3, title='meeting', date='2025-08-15', time='09:00', location='Prague, city center', description='SW Project meeting'}
+
+$alice@calendar>
+```
+## Deleting a User Account
+
+- This command permanently deletes your user account and all associated calendar data. This action cannot be undone
+- Enter: `delete_account`
+- The user has to be logged-in; he will be prompted to confirm the deletion by entering 'yes' or 'no'. If 'yes' is entered, the account and all associated data will be deleted.
+
+```
+$alice@calendar> delete_user
+For security, please re-enter your password to confirm deletion: ***
+Account 'alice' has been successfully deleted.
+
+$unlogged@calendar>
+```
+
 ## Server
 
 Sever runs and tracks the sessions with clients. Right now there is no limitation of clients to be logged in, but for each client there is the 180 seconds of inactivity interval, for which he must send any command so he is not terminated by the server. Server also gives each client an sessionId which uniquelly identifies the client. The server logs each action performed by every clint with some status (info, warn, fatal...).
