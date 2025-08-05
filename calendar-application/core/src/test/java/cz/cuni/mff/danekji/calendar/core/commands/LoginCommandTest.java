@@ -15,7 +15,8 @@ public class LoginCommandTest {
         // arrange
         UserInterface mockUI = mock(UserInterface.class);
         ClientSession mockSession = mock(ClientSession.class);
-        when(mockUI.promptForInput(anyString())).thenReturn("alice", "password");
+        when(mockUI.promptForInput(anyString())).thenReturn("alice");
+        when(mockUI.promptForPassword(anyString())).thenReturn("password");
 
         // act
         LoginCommand command = (LoginCommand) new LoginCommand().buildCommand(mockUI, mockSession);
@@ -31,7 +32,7 @@ public class LoginCommandTest {
         // arrange
         UserInterface mockUI = mock(UserInterface.class);
         ClientSession mockSession = mock(ClientSession.class);
-        when(mockUI.promptForInput(anyString())).thenReturn("", "password");
+        when(mockUI.promptForInput(anyString())).thenReturn("");
 
         // act & assert
         assertThrows(InvalidInputException.class, () ->

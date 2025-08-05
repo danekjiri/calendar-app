@@ -15,7 +15,8 @@ public class CreateAccountCommandTest {
         // arrange
         UserInterface mockUI = mock(UserInterface.class);
         ClientSession mockSession = mock(ClientSession.class);
-        when(mockUI.promptForInput(anyString())).thenReturn("bob", "password");
+        when(mockUI.promptForInput(anyString())).thenReturn("bob");
+        when(mockUI.promptForPassword(anyString())).thenReturn("password");
 
         // act
         CreateAccountCommand command = (CreateAccountCommand) new CreateAccountCommand().buildCommand(mockUI, mockSession);

@@ -27,7 +27,9 @@ public class CLICommandParserTest {
         UserInterface mockUI = mock(UserInterface.class);
         ClientSession mockSession = mock(ClientSession.class);
 
-        when(mockUI.promptForInput(anyString())).thenReturn("user", "pass");
+        when(mockUI.promptForInput(anyString())).thenReturn("user");
+        when(mockUI.promptForPassword(anyString())).thenReturn("pass");
+
         Command command = parser.parse("login", mockUI, mockSession);
 
         assertInstanceOf(LoginCommand.class, command);
