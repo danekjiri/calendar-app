@@ -255,4 +255,30 @@ public class DefaultCommandDispatcher implements CommandVisitor<Response, Client
         LOGGER.info("Client session '{}': Quitting.", session.getSessionId());
         return new SuccessQuit();
     }
+
+    /**
+     * The implementation of the CommandVisitor endpoint for DeleteUserCommand.
+     * Verifies credentials and deletes the user's account and data file.
+     *
+     * @param command The {@link DeleteUserCommand} command
+     * @param session The client session
+     * @return A {@link SuccessDeleteUserResponse} on success, or an {@link ErrorResponse} on failure.
+     */
+    @Override
+    public Response visit(DeleteUserCommand command, ClientSession session) {
+        if (!session.isLoggedIn()) {
+            LOGGER.error("Client session '{}': Attempt to delete user while not logged in.", session.getSessionId());
+            return new ErrorResponse("You must be logged in to delete your account.");
+        }
+
+        try {
+            // The user from the command contains the correct username and the verification password hash
+            eventRepository.deleteUser(command.getUser(), session);
+            String deletedUsername = session.getCurrentUser().username();
+            session.unsetCurrentUser(); // Log the user out after deletion
+            return new SuccessDeleteUserResponse("Account '" + deletedUsername + "' has been successfully deleted.");
+        } catch (CalendarException | IOException e) {
+            return new ErrorResponse(e.getMessage());
+        }
+    }
 }
