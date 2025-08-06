@@ -1,8 +1,8 @@
-# User guide for client-server CLI Calendar
+# User guide for client-server Calendar
 
 ## Introduction
 
-The calendar application is a console-based tool designed to manage calendar events through a client-server architecture. The client-server communication is build on top of socket and commands & responses are sent & received through java serialization API. If the client is not interacting with the server for longer than 180 seconds, the session will be closed and client as to reconnect. All the calendars with theirs events are stored on server-side and linked to specific account (User account is linked to exactly one calendar). User can add, delete, modify and show events that has been sent to server using some logged account. There are two type of privileges: 
+The calendar application is both console-based and GUI based tool designed to manage calendar events through a client-server architecture. The client-server communication is build on top of socket and commands & responses are sent & received through java serialization API. All the calendars with theirs events are stored on server-side and linked to specific account (User account is linked to exactly one calendar). User can add, delete, modify and show events that has been sent to server using some logged account. There are two type of privileges: 
 
 1. unlogged eg: `help` or `create_account`, ...
 2. logged eg: `add_event` or `show_events`, ...
@@ -15,8 +15,8 @@ This documentation provides step-by-step instructions on how to use the applicat
 Before using the application, ensure the following:
 
 - Server Availibity: The calendar server will be running by *default* (executing with `mvn exec:java`) on address `127.0.0.1:8080`. But you can specify given port by running the server with -Dexec.args="<port>" argument, where <port> is valid port number. Make sure given port is available.
-- Client connection: The calendar client will be connecting to server by *default* on address `127.0.0.1:8080`, but as with server, you can specify ip and port by starting the client with this command `mvn exec:java -Dexec.args="<server-address> <port>"`
-- Dependencies: You need Java 21 and newer, Maven and potentially jdom2, log4j, junit5, mockito, javadoc
+- Client connection: The calendar client will be connecting to server by *default* on address `127.0.0.1:8080`, but as with server, you can specify ip and port by starting the client with this command `mvn exec:java -Dexec.args="<server-address> <port>"` for CLI or `mvn javafx:run -Djavafx.args="<server-address> <port>"` for GUI.
+- Dependencies: You need Java 21 and newer, Maven and potentially jdom2, log4j, junit5, mockito, javadoc, javafx
 - Operating systems: multiplatform (developed on unix-like system)
 
 ## Building the application
@@ -51,10 +51,12 @@ expected output:
 ```bash
 # navigate back to project root if you 
 cd client # navigate to client root
-mvn exec:java # run the client with default connection to 127.0.0.1:8080
-# mvn exec:java -Dexec.args="192.168.0.2 12345" # for specific address and port connection
+mvn javafx:run # GUI - run the client with default connection to 127.0.0.1:8080
+# mvn javafx:run -Djavafx.args="192.168.0.2 12345" # for specific addres and port connection in GUI
+mvn exec:java # CLI - run the client with default connection to 127.0.0.1:8080
+# mvn exec:java -Dexec.args="192.168.0.2 12345" # for specific address and port connection in CLI
 ```
-expected output:
+expected output for CLI (similar for GUI):
 ```
 23:01:11.452 INFO  - Connected to '127.0.0.1:8080' with sessionId '1562431130'
 Available commands:
@@ -67,6 +69,8 @@ login: Login to the calendar system with your username and password.
 $unlogged@calendar> 
 
 ```
+
+# 1. CLI
 
 ## Available Commands
 
@@ -280,6 +284,68 @@ Account 'alice' has been successfully deleted.
 $unlogged@calendar>
 ```
 
-## Server
+# 2. GUI
+
+## Introduction
+
+The graphical user interface (GUI) provides a more visual and intuitive way to interact with the calendar application. It mirrors the functionality of the CLI but within a standard windowed environment.
+
+## The Login Screen
+
+When you first launch the GUI client, you'll be greeted by the Login Screen. This is your entry point to the application. From here, you can perform three main actions:
+- Login: If you already have an account, enter your username and password into the respective fields and click the **Login** button. If the credentials are correct, you will be taken to the Main Calendar View.
+- Create Account: If you are a new user, enter your desired username and password and click the **Create Account** button. The server will create a new account, and you'll receive a confirmation message. You can then log in with your new credentials.
+- Quit: Clicking the Quit button will close the application.
+
+_*NOTE*_: The username and password fields cannot be empty. If you attempt an action with empty fields, an error alert will be displayed.
+
+## Main Calendar View
+
+After a successful login, you'll see the Main Calendar View. This is where you'll manage all your events. The main view is composed of several key components:
+- Welcome Label: At the top left, a label welcomes you by displaying your username (e.g., Alice's Calendar).
+- Account Management Buttons: At the top right, you have two options:
+  - Delete Account: Permanently deletes your user account and all associated events after a confirmation prompt.
+  - Logout: Logs you out of the application and returns you to the Login Screen.
+- Event Table: The central part of the view is a table that displays your events with columns for ID, Title, Date, Time, Location, and Description. The columns of the table could be sorted by clicking the column name.
+- Action Buttons: At the bottom right, there are buttons to manage your events:
+  - Add Event: Opens a dialog to create a new event.
+  - Update Selected: Opens a dialog to edit the event currently selected in the table.
+  - Delete Selected: Deletes the currently selected event after a confirmation prompt.
+- Event Filter: At the bottom left, a dropdown menu allows you to filter the events shown in the table by a specific period.
+
+## Managing Events
+
+### Adding and Updating Events
+
+Whether you click **Add Event** or **Update Selected**, an "Event" dialog box will appear.
+
+- When Adding: The fields will be empty or set to default values (the date defaults to today).
+- When Updating: The fields will be pre-filled with the data from the selected event.
+- You must fill out the following fields:
+  - Title: A non-empty name for your event.
+  - Date: Select a date using the date picker.
+  - Time: Enter a time in HH:MM format (e.g., 15:30).
+  - Location (Optional): The location of the event.
+  - Description (Optional): Any additional details about the event.
+- Clicking **OK** will save the event and refresh the event table, while **Cancel** will close the dialog without saving. The application will show an alert if required fields are empty or if the time format is invalid.
+
+### Deleting an Event
+
+To delete an event:
+- Select the event you wish to remove from the event table.
+- Click the Delete Selected button.
+- A confirmation dialog will appear to prevent accidental deletion. Click **OK** to permanently delete the event.
+
+### Filtering Events
+
+Selecting an option from this menu will automatically filter the event table to show only the events that fall within that period. You can easily view events for a specific timeframe using the Filter Events dropdown menu at the bottom of the window. The available options are:
+- Show All (Default)
+- Today
+- Tomorrow
+- This Week
+- This Month
+- This Year
+
+# Server
 
 Sever runs and tracks the sessions with clients. Right now there is no limitation of clients to be logged in, but for each client there is the 180 seconds of inactivity interval, for which he must send any command so he is not terminated by the server. Server also gives each client an sessionId which uniquelly identifies the client. The server logs each action performed by every clint with some status (info, warn, fatal...).
