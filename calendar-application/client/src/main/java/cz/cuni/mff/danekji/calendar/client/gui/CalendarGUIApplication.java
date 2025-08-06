@@ -6,6 +6,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -66,6 +67,7 @@ public class CalendarGUIApplication extends Application {
     public void start(Stage primaryStage) {
         SceneManager sceneManager = new SceneManager(primaryStage, executorService);
         primaryStage.setTitle("Calendar Application");
+        primaryStage.initStyle(StageStyle.UNDECORATED); // Hide the window decorations
 
         primaryStage.setOnCloseRequest(event -> {
             event.consume();
