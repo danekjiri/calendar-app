@@ -31,7 +31,6 @@ import cz.cuni.mff.danekji.calendar.core.responses.Response;
 public class Server {
     private static final Logger LOGGER = LogManager.getLogger(Server.class.getName());
 
-    private static final int SESSION_TIMEOUT = 3 * 60 * 1000; // 3 minutes
     private static final Random RANDOM = new Random(42);
     private final Map<Integer, ClientSession> sessions = Collections.synchronizedMap(new HashMap<>());
     private final CommandVisitor<Response, ClientSession> commandDispatcher;
@@ -89,14 +88,6 @@ public class Server {
      * Sets up the connection, processes commands, and ensures proper cleanup.
      */
     private void handleClient(Socket clientSocket, ClientSession session) {
-        try {
-            configureSocket(clientSocket);
-        } catch (SocketException e) {
-            LOGGER.error("Client session '{}' encountered a socket error.", session.getSessionId(), e);
-            sessions.remove(session.getSessionId());
-            return;
-        }
-
         try (ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
              ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream())) {
             sendSessionId(out, session);
@@ -112,13 +103,6 @@ public class Server {
             }
             LOGGER.info("Client session '{}': Terminated and removed from sessions map.", session.getSessionId());
         }
-    }
-
-    /**
-     * Configures the client socket with a timeout.
-     */
-    private void configureSocket(Socket clientSocket) throws SocketException {
-        clientSocket.setSoTimeout(SESSION_TIMEOUT);
     }
 
     /**
@@ -142,9 +126,6 @@ public class Server {
                 Response response = command.accept(commandDispatcher, session);
                 out.writeObject(response);
                 out.flush();
-            } catch (SocketTimeoutException e) {
-                LOGGER.info("Session '{}' timed out after '{} seconds' inactivity. Closing connection...", session.getSessionId(), SESSION_TIMEOUT/1000);
-                return;
             } catch (EOFException e) {
                 LOGGER.info("Client session '{}' closed the connection.", session.getSessionId());
                 return;
