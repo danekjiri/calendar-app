@@ -31,7 +31,9 @@ public final class DeleteUserCommand implements Command {
         this.user = user;
     }
 
-    // Default constructor for reflection
+    /**
+     * Default constructor for the command, used when no user object is provided.
+     */
     public DeleteUserCommand() {
         this(null);
     }

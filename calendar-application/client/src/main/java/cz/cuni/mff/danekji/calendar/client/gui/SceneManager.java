@@ -25,6 +25,13 @@ public class SceneManager {
     private MainController mainController;
     private final ExecutorService executorService;
 
+    /**
+     * Constructor for SceneManager.
+     * Initializes the primary stage and executor service.
+     *
+     * @param primaryStage The main stage of the application.
+     * @param executorService The executor service for running tasks in the background.
+     */
     public SceneManager(Stage primaryStage, ExecutorService executorService) {
         this.primaryStage = primaryStage;
         this.executorService = executorService;

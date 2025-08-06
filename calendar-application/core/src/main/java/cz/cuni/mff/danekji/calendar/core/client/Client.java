@@ -16,6 +16,7 @@ public interface Client {
      *
      * @param host The host name or IP address of the server
      * @param port The port number of the server
+     * @return true if the connection was successful, false otherwise
      */
     boolean connect(String host, int port);
 

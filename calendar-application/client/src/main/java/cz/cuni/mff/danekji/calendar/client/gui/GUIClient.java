@@ -27,6 +27,8 @@ public class GUIClient extends AbstractClient {
     /**
      * The main method to run the GUI client.
      * It accepts server address and port as command-line arguments and initializes the JavaFX application.
+     *
+     * @param args Command-line arguments where the first argument is the server address and the second is the port.
      */
     public static void main(String[] args) {
         if (args.length > 2 || args.length == 1) {

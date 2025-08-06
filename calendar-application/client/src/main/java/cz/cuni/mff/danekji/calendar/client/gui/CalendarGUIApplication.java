@@ -22,6 +22,12 @@ public class CalendarGUIApplication extends Application {
     private static final Logger LOGGER = LogManager.getLogger(CalendarGUIApplication.class);
 
     /**
+     * Default constructor for the CalendarGUIApplication.
+     * It is required by the JavaFX framework.
+     */
+    public CalendarGUIApplication() { }
+
+    /**
      * Shared client instance for the entire GUI application.
      * This instance is set before launching the application using {@link #setClient(GUIClient)}
      * and is used to communicate with the server.
