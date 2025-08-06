@@ -32,7 +32,7 @@ public final class DeleteUserCommand implements Command {
     }
 
     // Default constructor for reflection
-    DeleteUserCommand() {
+    public DeleteUserCommand() {
         this(null);
     }
 

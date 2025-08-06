@@ -66,6 +66,7 @@ public final class ShowFutureEventsCommand implements Command {
 
         String menu = """
                 Select a period to show future events:
+                0. Today
                 1. Tomorrow
                 2. This Week
                 3. This Month
@@ -78,6 +79,10 @@ public final class ShowFutureEventsCommand implements Command {
         LocalDate start, end;
 
         switch (choice) {
+            case "0": // Today
+                start = today;
+                end = start;
+                break;
             case "1": // Tomorrow
                 start = today.plusDays(1);
                 end = start;

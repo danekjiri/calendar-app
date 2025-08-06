@@ -16,7 +16,7 @@ public final class ShowEventsCommand implements Command {
     /**
      * The default constructor for the ShowEventsCommand class.
      */
-    ShowEventsCommand() {}
+    public ShowEventsCommand() {}
 
     /**
      * The method builds the command by checking if the user is logged in.
