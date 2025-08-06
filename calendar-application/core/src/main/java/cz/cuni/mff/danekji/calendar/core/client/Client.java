@@ -17,7 +17,7 @@ public interface Client {
      * @param host The host name or IP address of the server
      * @param port The port number of the server
      */
-    void connect(String host, int port);
+    boolean connect(String host, int port);
 
     /**
      * Starts the client application in the UI.
