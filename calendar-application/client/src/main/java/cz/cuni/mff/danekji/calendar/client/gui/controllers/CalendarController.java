@@ -21,6 +21,12 @@ public abstract class CalendarController {
     private GUIResponseDispatcher responseDispatcher;
 
     /**
+     * Default constructor for CalendarController.
+     * Needed for JavaFX FXML loading.
+     */
+    public CalendarController() {}
+
+     /**
      * Initializes the controller with the SceneManager and ExecutorService.
      * This method should be called by the specific controller after it is created.
      *
@@ -36,6 +42,8 @@ public abstract class CalendarController {
     /**
      * Sends a command to the server using the client instance.
      * This method runs the command in a background task to avoid blocking the JavaFX application thread.
+     *
+     * @param command The command to be sent to the server.
      */
     protected void sendCommand(Command command) {
         Task<Void> task = new Task<>() {

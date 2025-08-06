@@ -21,6 +21,12 @@ public class EventDialogController extends CalendarController {
     @FXML private TextField descriptionField;
 
     /**
+     * Default constructor for EventDialogController.
+     * Needed for JavaFX FXML loading.
+     */
+    public EventDialogController() {}
+
+    /**
      * Sets up the dialog with the provided event data and validation.
      * If the event is null, it initializes the dialog for creating a new event.
      * Else it initializes the dialog for editing an existing event.

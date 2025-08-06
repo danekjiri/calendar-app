@@ -40,6 +40,12 @@ public class MainController extends CalendarController {
     @FXML private ComboBox<FutureInterval> filterComboBox;
 
     /**
+     * Default constructor for MainController.
+     * Needed for JavaFX FXML loading.
+     */
+    public MainController() {}
+
+    /**
      * Observable list to hold the event data displayed in the table.
      * It is initialized with an empty list and will be populated with events.
      */

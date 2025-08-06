@@ -16,6 +16,12 @@ public class LoginController extends CalendarController {
     @FXML private PasswordField passwordField;
 
     /**
+     * Default constructor for LoginController.
+     * Needed for JavaFX FXML loading.
+     */
+    public LoginController() {}
+
+    /**
      * Handles the login action when the login button is clicked.
      * It retrieves the user information from the input fields and sends a LoginCommand.
      */
