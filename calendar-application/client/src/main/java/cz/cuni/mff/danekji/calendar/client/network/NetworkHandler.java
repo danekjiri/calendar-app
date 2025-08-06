@@ -1,4 +1,4 @@
-package cz.cuni.mff.danekji.calendar.client.cli;
+package cz.cuni.mff.danekji.calendar.client.network;
 
 import cz.cuni.mff.danekji.calendar.core.commands.Command;
 import cz.cuni.mff.danekji.calendar.core.responses.Response;
