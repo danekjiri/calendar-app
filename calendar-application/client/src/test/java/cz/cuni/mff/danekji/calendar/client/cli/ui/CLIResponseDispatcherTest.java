@@ -2,7 +2,6 @@ package cz.cuni.mff.danekji.calendar.client.cli.ui;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import cz.cuni.mff.danekji.calendar.client.cli.ui.CLIResponseDispatcher;
 import cz.cuni.mff.danekji.calendar.core.client.session.ClientSession;
 import cz.cuni.mff.danekji.calendar.core.models.User;
 import cz.cuni.mff.danekji.calendar.core.responses.error.ErrorResponse;
