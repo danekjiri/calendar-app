@@ -29,21 +29,6 @@ public class GUIResponseDispatcher implements ResponseVisitor<Void, ClientSessio
         this.sceneManager = sceneManager;
     }
 
-    @Override
-    public Void visit(SuccessLogoutResponse response, ClientSession session) throws IOException {
-        return null;
-    }
-
-    @Override
-    public Void visit(SuccessEventListResponse response, ClientSession session) throws IOException {
-        return null;
-    }
-
-    @Override
-    public Void visit(SuccessDeleteUserResponse response, ClientSession session) throws IOException {
-        return null;
-    }
-
     private void showAlert(Alert.AlertType type, String title, String message) {
         Platform.runLater(() -> {
             Alert alert = new Alert(type);
@@ -91,6 +76,63 @@ public class GUIResponseDispatcher implements ResponseVisitor<Void, ClientSessio
         return null;
     }
 
+    /**
+     * Handles a successful logout response by clearing the current user and showing the login screen.
+     *
+     * @param response The success logout response to handle.
+     * @param session  The current client session.
+     * @return null
+     */
+    @Override
+    public Void visit(SuccessLogoutResponse response, ClientSession session) {
+        session.unsetCurrentUser();
+        Platform.runLater(() -> {
+            try {
+                sceneManager.showLoginScreen();
+            } catch (IOException e) {
+                showAlert(Alert.AlertType.ERROR, "UI Error", "Failed to return to the login screen.");
+                LOGGER.error("Failed to return to the login screen.", e);
+            }
+        });
+        return null;
+    }
+
+    /**
+     * Handles a successful event list response by updating the event table in the main controller.
+     *
+     * @param response The success event list response to handle.
+     * @param session  The current client session.
+     * @return null
+     */
+    @Override
+    public Void visit(SuccessEventListResponse response, ClientSession session) {
+        if (sceneManager.getMainController() != null) {
+            Platform.runLater(() -> sceneManager.getMainController().updateEventTable(response.events()));
+        }
+        return null;
+    }
+
+    /**
+     * Handles a successful event creation response by showing an alert and refreshing the event list.
+     *
+     * @param response The success event creation response to handle.
+     * @param session  The current client session.
+     * @return null
+     */
+    @Override
+    public Void visit(SuccessDeleteUserResponse response, ClientSession session) {
+        session.unsetCurrentUser();
+        showAlert(Alert.AlertType.INFORMATION, "Account Deleted", response.message());
+        Platform.runLater(() -> {
+            try {
+                sceneManager.showLoginScreen();
+            } catch (IOException e) {
+                showAlert(Alert.AlertType.ERROR, "UI Error", "Failed to return to the login screen.");
+                LOGGER.error("Failed to return to the login screen.", e);
+            }
+        });
+        return null;
+    }
 
     /**
      * Handles a successful quit response by terminating the session and exiting the application.
