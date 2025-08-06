@@ -15,4 +15,5 @@ module cz.cuni.mff.danekji.calendar.client {
     exports cz.cuni.mff.danekji.calendar.client.cli.ui;
     exports cz.cuni.mff.danekji.calendar.client.network;
     exports cz.cuni.mff.danekji.calendar.client.gui;
+    exports cz.cuni.mff.danekji.calendar.client.gui.controllers;
 }

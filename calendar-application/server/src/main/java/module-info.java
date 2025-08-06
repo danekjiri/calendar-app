@@ -7,4 +7,6 @@ module cz.cuni.mff.danekji.calendar.server {
     requires java.logging;
     requires org.apache.logging.log4j;
     requires org.jdom2;
+
+    exports  cz.cuni.mff.danekji.calendar.server;
 }
