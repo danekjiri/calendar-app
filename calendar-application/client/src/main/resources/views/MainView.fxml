@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="600.0" prefWidth="800.0"
+            styleClass="root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="cz.cuni.mff.danekji.calendar.client.gui.controllers.MainController">
+    <top>
+        <HBox alignment="CENTER_LEFT" prefHeight="50.0" spacing="20.0" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets left="20.0" right="20.0"/>
+            </padding>
+            <Label fx:id="welcomeLabel" styleClass="header-label">
+                <font>
+                    <Font name="System Bold" size="18.0"/>
+                </font>
+            </Label>
+            <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                <Button onAction="#handleDeleteUser" styleClass="button-danger" text="Delete Account">
+                    <HBox.margin>
+                        <Insets right="10.0" />
+                    </HBox.margin>
+                </Button>
+                <Button onAction="#handleLogout" styleClass="button-danger" text="Logout"/>
+            </HBox>
+        </HBox>
+    </top>
+    <center>
+        <TableView fx:id="eventTable" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <columns>
+                <TableColumn fx:id="idColumn" prefWidth="50.0" text="ID" />
+                <TableColumn fx:id="titleColumn" prefWidth="150.0" text="Title" />
+                <TableColumn fx:id="dateColumn" prefWidth="100.0" text="Date" />
+                <TableColumn fx:id="timeColumn" prefWidth="75.0" text="Time" />
+                <TableColumn fx:id="locationColumn" prefWidth="150.0" text="Location" />
+                <TableColumn fx:id="descriptionColumn" prefWidth="250.0" text="Description" />
+            </columns>
+            <BorderPane.margin>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </BorderPane.margin>
+        </TableView>
+    </center>
+    <bottom>
+        <HBox alignment="CENTER" prefHeight="60.0" spacing="10.0" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+            </padding>
+            <Label text="Filter Events:"/>
+            <ComboBox fx:id="filterComboBox" promptText="Select Period..."/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button onAction="#handleAddEvent" styleClass="button-primary" text="Add Event"/>
+            <Button onAction="#handleUpdateEvent" text="Update Selected"/>
+            <Button onAction="#handleDeleteEvent" styleClass="button-danger" text="Delete Selected"/>
+        </HBox>
+    </bottom>
+</BorderPane>
