@@ -6,21 +6,22 @@ A Java 21 client–server calendar application built with Maven. This project is
 
 - Java 21 or later
 - Maven
-- log4j, jdom2, jupiter
+- log4j, jdom2, jupiter, javafx, mockito
 
 ## Build
 
 1. Clone the repository: `git clone https://github.com/danekjiri/calendar-app.git`
 2. Navigate to the project directory: `cd calendar-app`
 3. Build the project: `mvn clean install`
-4. Go to `server` module: `cd server`
+4. Go to **server** module: `cd server`
 5. Run the server: `mvn exec:java`
 6. Return to the project root: `cd ..`
-7. Go to `client` module: `cd client`
-8. Run how many clients you want: `mvn exec:java`
+7. Go to **client** module: `cd client`
+8. Run how many clients you want: `mvn javafx:run` for GUI or `mvn exec:java` for CLI
+9. (optionally you can set address and port using `mvn javafx:run -Djavafx.args="<server-address> <port>"` for GUI or `mvn exec:java -Dexec.args="<server-address> <port>"` for CLI)
 
 ## Documentation
-The project is documented using JavaDoc. To generate the documentation, run the following command from the *project root*: `mvn clean install javadoc:aggregate `.
+The project is documented using JavaDoc. To generate the documentation, run the following command from the **project root**: `mvn clean install javadoc:aggregate `.
 
 The generated documentation will be available in the `target/reports/apidocs/` directory of the *project root*. [docs](calendar-application/target/reports/apidocs/index.html)
 
@@ -34,15 +35,12 @@ The project is organized as a multi-module Maven project with three sub-modules:
   Contains shared types (commands, responses, and models, exceptions, ...) that are exchanged between the client and server via object streams.
 
 - **client**  
-  Implements the client-side logic including network communication, command parsing, and a command-line user interface. The client connects to the server and sends commands (e.g. login, create_account, add_event, show_events etc.) after prompting the user for input and presenting the server's response.
+  Implements the client-side logic including network communication, command parsing, graphical user interface and a command-line user interface. The client connects to the server and sends commands (e.g. login, create_account, add_event, show_events etc.) after prompting the user for input and presenting the server's response.
 
 - **server**  
   Implements the server-side logic, including handling concurrent client connections, session management, command dispatch (using the Visitor pattern), and persistence (using XML via the default Java DOM parser). The server ensures that only logged‐in users may perform privileged actions (such as adding events).
 
 ## Future Enhancements
-- **Command Enhancements**:
-  -  add show_future_events command
-  -  add delete_user command
 - **Limit users on server**: Limit the number and only one logged user of given username
-- **GUI**: Implement a graphical user interface for the client to enhance user experience.
 - **Database**: Integrate a more robust database system (e.g., PostgreSQL, MySQL) for better data management and scalability.
+- ...
